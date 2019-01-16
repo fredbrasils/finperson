@@ -1,7 +1,9 @@
 package br.com.finperson.core.repository;
 
+import org.springframework.data.repository.CrudRepository;
+
 import br.com.finperson.domain.CategoryEntity;
 
-public interface CategoryRepository extends BaseRepository<CategoryEntity, Long>{
+public interface CategoryRepository extends CrudRepository<CategoryEntity, Long>{
 
 }
