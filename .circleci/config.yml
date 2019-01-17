@@ -45,7 +45,8 @@ jobs:
       - store_test_results:
           path: target/surefire-reports
 
-language: java
-after_success:
-  - bash <(curl -s https://codecov.io/bash) -t 9dd9b8b7-123f-4925-9fac-67edfe626133
+      - run:
+          name: Send to CodeCov
+          command: bash <(curl -s https://codecov.io/bash) -t 9dd9b8b7-123f-4925-9fac-67edfe626133
+        
       
