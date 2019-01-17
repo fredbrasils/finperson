@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+	<h2>Categories</h2>
+
+	<table id="vets" class="table table-striped">
+		<thead>
+			<tr>
+				<th style="width: 150px;">Name</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="category : ${categories}">
+				<td>
+					<a th:href="@{/category/__${category.id}__}" th:text="${category.name}" /></a>
+				</td>				
+			</tr>
+		</tbody>
+	</table>
+
+</body>
+</html>

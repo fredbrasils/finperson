@@ -15,7 +15,6 @@ public class DataLoader implements CommandLineRunner {
 		this.categoryService = categoryService;
 	}
 
-	@Override
 	public void run(String... args) throws Exception {
 
 		CategoryEntity transport = new CategoryEntity();

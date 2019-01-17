@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import br.com.finperson.core.service.CategoryService;
-import br.com.finperson.domain.CategoryEntity;
 
 @RequestMapping("/category")
 @Controller
@@ -24,9 +23,9 @@ public class CategoryController {
         dataBinder.setDisallowedFields("id");
     }
     
-    @RequestMapping("/find")
+    @RequestMapping("/list")
     public String findCategories(Model model){
-        model.addAttribute("category", categoryService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         return "category/categories";
     }
 }
