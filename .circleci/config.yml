@@ -47,5 +47,5 @@ jobs:
 
 language: java
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -t 9dd9b8b7-123f-4925-9fac-67edfe626133
       
