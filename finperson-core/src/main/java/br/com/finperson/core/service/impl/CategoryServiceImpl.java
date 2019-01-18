@@ -15,7 +15,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	
 	public CategoryServiceImpl(CategoryRepository categoryRepository) {
 		super(categoryRepository);
-		log.debug("Create CategoryServiceImpl");
+		//log.debug("Create CategoryServiceImpl");
 		this.categoryRepository = categoryRepository;
 	}	
 	
