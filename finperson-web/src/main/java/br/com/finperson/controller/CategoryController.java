@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import br.com.finperson.core.service.CategoryService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequestMapping("/category")
 @Controller
 public class CategoryController {
@@ -25,6 +27,7 @@ public class CategoryController {
     
     @RequestMapping("/list")
     public String findCategories(Model model){
+    	log.debug("CategoryController::findCategories");
         model.addAttribute("categories", categoryService.findAll());
         return "category/categories";
     }

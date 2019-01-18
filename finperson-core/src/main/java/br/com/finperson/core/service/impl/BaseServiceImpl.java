@@ -16,34 +16,34 @@ public abstract class BaseServiceImpl<T, ID> implements BaseService<T, ID>{
 	private final CrudRepository<T, ID> crudRepository;
 	
 	public BaseServiceImpl(CrudRepository<T, ID> crudRepository) {
-		//log.debug("Create Super BaseServiceImpl");
+		log.debug("Create Super BaseServiceImpl");
 		this.crudRepository = crudRepository;
 	}
 	
 	public T findById(ID id) {
-		//log.debug("BaseServiceImpl::findById");
+		log.debug("BaseServiceImpl::findById");
 		return (T) crudRepository.findById(id).orElse(null);		
 	}
 
 	public T save(T entity) {
-		//log.debug("BaseServiceImpl::save");
+		log.debug("BaseServiceImpl::save");
 		return (T) crudRepository.save(entity);
 	}
 
 	public Set<T> findAll() {
-		//log.debug("BaseServiceImpl::findAll");
+		log.debug("BaseServiceImpl::findAll");
 		Set<T> entities = new HashSet<T>();
 		crudRepository.findAll().forEach(entities::add);
 		return entities;
 	}
 
 	public void delete(T entity) {
-		//log.debug("BaseServiceImpl::delete");
+		log.debug("BaseServiceImpl::delete");
 		crudRepository.delete(entity);
 	}
 
 	public void deleteById(ID id) {
-		//log.debug("BaseServiceImpl::deleteById");
+		log.debug("BaseServiceImpl::deleteById");
 		crudRepository.deleteById(id);
 	}
 
