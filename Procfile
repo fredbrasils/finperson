@@ -1,1 +1,1 @@
-web: java -jar target/finperson-web-0.0.1-SNAPSHOT.jar
+web: java -jar finperson-web/target/finperson-web-0.0.1-SNAPSHOT.jar
