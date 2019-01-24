@@ -10,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class IndexController {
 
-    
+    /*
     @RequestMapping({"/","/index","/index.html"})
     public String home(Model model){
     	log.debug("IndexController::home");
         return "index";
     }
+    */
 }
