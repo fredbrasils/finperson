@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         return new InMemoryUserDetailsManager(user);
     }
     
+    @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/index").setViewName("index");
         registry.addViewController("/").setViewName("index");

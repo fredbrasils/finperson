@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 
 import br.com.finperson.core.service.CategoryService;
 import br.com.finperson.domain.CategoryEntity;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class DataLoader implements CommandLineRunner {
 
@@ -34,7 +36,7 @@ public class DataLoader implements CommandLineRunner {
 		categoryService.save(health);
 		categoryService.save(sport);
 
-		System.out.println("Loaded Categories....");
+		log.debug("Loaded Categories....");
 
 	}
 
