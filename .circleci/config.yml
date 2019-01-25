@@ -34,7 +34,7 @@ jobs:
 
       - run: mvn dependency:go-offline
       
-      - run: mvn sonar:sonar -Dsonar.projectKey=fredbrasils_finperson -Dsonar.organization=fredbrasils-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b0845985e29c2a958233fc184f790f53fff17d8d
+      - run: mvn install sonar:sonar -Dsonar.projectKey=fredbrasils_finperson -Dsonar.organization=fredbrasils-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b0845985e29c2a958233fc184f790f53fff17d8d
 
       - save_cache:
           paths:
