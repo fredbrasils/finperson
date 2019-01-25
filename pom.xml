@@ -33,6 +33,9 @@
 		<jaxb.version>2.3.0</jaxb.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+
+		<sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
+
 	</properties>
 
 	<dependencies>
@@ -51,7 +54,67 @@
 			<artifactId>jaxb-impl</artifactId>
 			<version>${jaxb.version}</version>
 		</dependency>
+
+		<!-- dependency> <groupId>org.openclover</groupId> <artifactId>clover-runtime</artifactId> 
+			<version>4.3.1</version> </dependency -->
+
+		<!-- dependency> <groupId>org.sonarsource.clover</groupId> <artifactId>sonar-clover-plugin</artifactId> 
+			<version>3.1</version> </dependency -->
+
+		<!-- dependency> <groupId>org.sonarsource.scanner.maven</groupId> <artifactId>sonar-maven-plugin</artifactId> 
+			<version>3.6.0.1398</version> </dependency -->
+
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>sonar-coverage</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.jacoco</groupId>
+							<artifactId>ja.coco-maven-plugin</artifactId>
+							<version>0.8.2</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<append>true</append>
+						</configuration>
+						<executions>
+							<execution>
+								<id>agent-for-ut</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>agent-for-it</id>
+								<goals>
+									<goal>prepare-agent-integration</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>jacoco-site</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
@@ -72,8 +135,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>--illegal-access=permit</argLine>
-
 					<!-- Excludes integration tests when unit tests are run. -->
 					<excludes>
 						<exclude>**/IT*.java</exclude>
@@ -84,10 +145,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<argLine>--illegal-access=permit</argLine>
-					<skipTests>true</skipTests>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -98,26 +155,64 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
+				<executions> <execution> <id>copy-dependencies</id> <phase>package</phase> 
+				<goals> <goal>copy-dependencies</goal> </goals> </execution> </executions> 
+				</plugin -->
 
-			<plugin>
-				<groupId>org.openclover</groupId>
-				<artifactId>clover-maven-plugin</artifactId>
-			</plugin>
+			<!-- plugin> <groupId>org.openclover</groupId> <artifactId>clover-maven-plugin</artifactId> 
+				<version>4.3.1</version> </plugin -->
+
 
 		</plugins>
+
+		<!-- pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>3.5.0.1254</version>
+					<executions>
+						<execution>
+							<phase>verify</phase>
+							<goals>
+								<goal>sonar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.2</version>
+					<configuration>
+						<append>true</append>
+					</configuration>
+					<executions>
+						<execution>
+							<id>prepare-agent</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>prepare-agent-integration</id>
+							<goals>
+								<goal>prepare-agent-integration</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>jacoco-site</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement -->
+
 	</build>
 
 </project>
