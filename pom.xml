@@ -55,15 +55,6 @@
 			<version>${jaxb.version}</version>
 		</dependency>
 
-		<!-- dependency> <groupId>org.openclover</groupId> <artifactId>clover-runtime</artifactId> 
-			<version>4.3.1</version> </dependency -->
-
-		<!-- dependency> <groupId>org.sonarsource.clover</groupId> <artifactId>sonar-clover-plugin</artifactId> 
-			<version>3.1</version> </dependency -->
-
-		<!-- dependency> <groupId>org.sonarsource.scanner.maven</groupId> <artifactId>sonar-maven-plugin</artifactId> 
-			<version>3.6.0.1398</version> </dependency -->
-
 	</dependencies>
 
 	<profiles>
@@ -155,63 +146,7 @@
 				</executions>
 			</plugin>
 
-			<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
-				<executions> <execution> <id>copy-dependencies</id> <phase>package</phase> 
-				<goals> <goal>copy-dependencies</goal> </goals> </execution> </executions> 
-				</plugin -->
-
-			<!-- plugin> <groupId>org.openclover</groupId> <artifactId>clover-maven-plugin</artifactId> 
-				<version>4.3.1</version> </plugin -->
-
-
 		</plugins>
-
-		<!-- pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.sonarsource.scanner.maven</groupId>
-					<artifactId>sonar-maven-plugin</artifactId>
-					<version>3.5.0.1254</version>
-					<executions>
-						<execution>
-							<phase>verify</phase>
-							<goals>
-								<goal>sonar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.2</version>
-					<configuration>
-						<append>true</append>
-					</configuration>
-					<executions>
-						<execution>
-							<id>prepare-agent</id>
-							<goals>
-								<goal>prepare-agent</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>prepare-agent-integration</id>
-							<goals>
-								<goal>prepare-agent-integration</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>jacoco-site</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement -->
 
 	</build>
 
