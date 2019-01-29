@@ -3,6 +3,7 @@ package br.com.finperson.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -25,7 +26,7 @@ public class CategoryController {
         dataBinder.setDisallowedFields("id");
     }
     
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public String findCategories(Model model){
     	log.debug("CategoryController::findCategories");
         model.addAttribute("categories", categoryService.findAll());
