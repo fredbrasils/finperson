@@ -22,17 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implements UserService {
 
-	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
 	private UserRepository userRepository;
 	private RoleRepository roleRepository;
 
-	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
 		super(userRepository);
 		log.debug("Create UserServiceImpl");
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override

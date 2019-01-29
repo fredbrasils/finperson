@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
@@ -37,6 +38,9 @@ class UserServiceImplTest {
 
 	@Mock
 	RoleRepository roleRepository;
+	
+	@Mock
+	PasswordEncoder passwordEncoder;
 	
 	@InjectMocks
 	UserServiceImpl userService;
@@ -141,6 +145,7 @@ class UserServiceImplTest {
 		when(userRepository.findByEmail(any())).thenReturn(null);
 		when(roleRepository.findByRole(any())).thenReturn(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADIM).build());
 		when(userRepository.save(any())).thenReturn(returnUser);
+		when(passwordEncoder.encode(any())).thenReturn("1234");
 		
 		UserEntity newUser = null;
 		try {
