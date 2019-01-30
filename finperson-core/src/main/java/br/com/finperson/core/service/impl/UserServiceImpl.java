@@ -5,10 +5,10 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.finperson.core.repository.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
 import br.com.finperson.core.service.UserService;
@@ -43,13 +43,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 	@Transactional
     @Override
     public UserEntity registerNewUserAccount(UserDTO accountDto) 
-      throws RuntimeException {
+      throws EmailExistsException {
          
 		log.debug("Register user");
 		
         if (emailExists(accountDto.getEmail())) {   
-            throw new RuntimeException(
-              "There is an account with that email address:  + accountDto.getEmail()");
+            throw new EmailExistsException(
+              "There is an account with that email address:"  + accountDto.getEmail());
         }
         UserEntity user = new UserEntity();    
         user.setFirstName(accountDto.getFirstName());

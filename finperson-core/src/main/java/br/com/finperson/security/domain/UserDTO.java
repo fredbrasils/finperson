@@ -8,13 +8,12 @@ import br.com.finperson.util.validation.annotation.PasswordMatches;
 import br.com.finperson.util.validation.annotation.ValidEmail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Builder
 @PasswordMatches
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +33,7 @@ public class UserDTO {
     private String password;
     private String matchingPassword;
      
-    @ValidEmail
+    @ValidEmail(acceptEmptyString = false)
     @NotNull
     @NotEmpty
     private String email;

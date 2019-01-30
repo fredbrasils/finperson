@@ -1,16 +1,24 @@
 package br.com.finperson.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import br.com.finperson.core.repository.EmailExistsException;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.util.validation.annotation.PasswordMatches;
 
 @Controller
 public class UserController {
@@ -29,39 +37,52 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/registration", method = RequestMethod.POST)
-	public ModelAndView registerUserAccount(@ModelAttribute("user") UserDTO accountDto) {
-		
-		UserEntity registered = null;
-		
-		//if (!result.hasErrors()) {
+	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserDTO accountDto, BindingResult result,
+			WebRequest request, Errors errors) {
+
+		UserEntity registered = new UserEntity();
+
+		if (!result.hasErrors()) {
 			registered = createUserAccount(accountDto);
-		//}
-		
-//		if (registered == null) {
-//			result.rejectValue("email", "message.regError");
-//		}
-		
-//	    if (result.hasErrors()) {
-//	        return new ModelAndView("user/registration", "user", accountDto);
-//	    } 
-//	    else {
-//	        return new ModelAndView("successRegister", "user", accountDto);
-	        return new ModelAndView("login");
-//	    }
-	
+		}
+
+		if (registered == null) {
+			result.rejectValue("email", "message.regError");
+		}
+
+	    if (result.hasErrors()) {
+	    	boolean passwordMatches = false;
+	    	
+	    	for (Object object : result.getAllErrors()) {
+	    	    if(object instanceof ObjectError) {
+	    	        ObjectError objectError = (ObjectError) object;
+
+	    	        if(objectError.getCode().equals(PasswordMatches.class.getSimpleName())) {
+	    	        	passwordMatches = true;
+	    	        }
+	    	    }
+	    	}
+	    	
+	    	if(passwordMatches) {
+	    		result.rejectValue("password", "PasswordMatches.user");
+	    	}
+	    	
+	        return new ModelAndView("user/registration", "user", accountDto);
+	    } 
+	    else {
+	        return new ModelAndView("user/successRegister", "user", accountDto);
+	    }
+
 	}
 
 	private UserEntity createUserAccount(UserDTO accountDto) {
 		UserEntity registered = null;
-		
+
 		try {
 			registered = userService.registerNewUserAccount(accountDto);
-		} catch (Exception e) {
+		} catch (EmailExistsException e) {
 			return null;
 		}
-//		} catch (EmailExistsException e) {
-//			return null;
-//		}
 		return registered;
 	}
 }

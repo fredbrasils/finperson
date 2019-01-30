@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import br.com.finperson.core.repository.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
 import br.com.finperson.domain.RoleEntity;
@@ -164,7 +165,7 @@ class UserServiceImplTest {
 	void testNotRegisterUserAccount() {
 		
 		when(userRepository.findByEmail(any())).thenReturn(returnUser);
-		assertThrows(RuntimeException.class, () -> userService.registerNewUserAccount(new UserDTO()));
+		assertThrows(EmailExistsException.class, () -> userService.registerNewUserAccount(new UserDTO()));
 
 	}
 }
