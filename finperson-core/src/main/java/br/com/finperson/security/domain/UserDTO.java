@@ -1,8 +1,7 @@
 package br.com.finperson.security.domain;
 
 import javax.validation.constraints.NotEmpty;
-
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotNull;
 
 import br.com.finperson.util.validation.annotation.PasswordMatches;
 import br.com.finperson.util.validation.annotation.ValidEmail;
@@ -33,7 +32,7 @@ public class UserDTO {
     private String password;
     private String matchingPassword;
      
-    @ValidEmail(acceptEmptyString = false)
+    @ValidEmail(acceptEmptyString = true)
     @NotNull
     @NotEmpty
     private String email;

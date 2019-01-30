@@ -3,10 +3,17 @@ package br.com.finperson.util.validation;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.annotation.Annotation;
+
+import javax.validation.Payload;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.Test;
+
+import br.com.finperson.util.validation.annotation.ValidEmail;
 
 class EmailValidatorTest {
 
@@ -43,5 +50,43 @@ class EmailValidatorTest {
 	@RepeatedTest(15)
 	void notValidEmail(RepetitionInfo repeat) {
 		assertFalse(validator.isValid(INVALID_EMAILS[repeat.getCurrentRepetition()-1], null));
+	}
+	
+	@DisplayName(value="This email is empty and is permited")
+	@Test
+	void validEmptyEmail() {
+		EmailValidator validator = getEmailValidator(true);
+		assertTrue(validator.isValid("", null));
+	}
+	
+	@DisplayName(value="This email is empty and is not permited")
+	@Test
+	void notValidEmptyEmail() {
+		EmailValidator validator = getEmailValidator(false);
+		assertFalse(validator.isValid("", null));
+	}
+	
+	private EmailValidator getEmailValidator(boolean acceptEmptyEmail) {
+		
+		EmailValidator validator = new EmailValidator();
+		validator.initialize(new ValidEmail() {
+			
+			@Override
+			public Class<? extends Annotation> annotationType() {return null;}
+			
+			@Override
+			public Class<? extends Payload>[] payload() { return null;}
+			
+			@Override
+			public String message() {return null;}
+			
+			@Override
+			public Class<?>[] groups() { return null;}
+			
+			@Override
+			public boolean acceptEmptyString() {return acceptEmptyEmail;}
+		});
+		
+		return validator;
 	}
 }

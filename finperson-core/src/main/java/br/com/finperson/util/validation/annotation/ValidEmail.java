@@ -19,5 +19,5 @@ public @interface ValidEmail {
     String message() default "Invalid email";
     Class<?>[] groups() default {}; 
     Class<? extends Payload>[] payload() default {};
-    boolean acceptEmptyString() default true;
+    boolean acceptEmptyString() default false;
 }

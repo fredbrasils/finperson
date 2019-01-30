@@ -22,17 +22,17 @@ public abstract class BaseServiceImpl<T, ID> implements BaseService<T, ID>{
 	
 	public T findById(ID id) {
 		log.debug("BaseServiceImpl::findById");
-		return (T) crudRepository.findById(id).orElse(null);		
+		return crudRepository.findById(id).orElse(null);		
 	}
 
 	public T save(T entity) {
 		log.debug("BaseServiceImpl::save");
-		return (T) crudRepository.save(entity);
+		return crudRepository.save(entity);
 	}
 
 	public Set<T> findAll() {
 		log.debug("BaseServiceImpl::findAll");
-		Set<T> entities = new HashSet<T>();
+		Set<T> entities = new HashSet<>();
 		crudRepository.findAll().forEach(entities::add);
 		return entities;
 	}

@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import br.com.finperson.core.service.security.impl.UserDetailsServiceImpl;
+import br.com.finperson.util.ConstantsURL;
 
 @Configuration
 @EnableWebSecurity
@@ -23,17 +24,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/", "/index","/user/**").permitAll()
+                .antMatchers(ConstantsURL.SLASH, ConstantsURL.SLASH + ConstantsURL.INDEX,"/user/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .formLogin()
-                .loginPage("/login")
+                .loginPage(ConstantsURL.SLASH + ConstantsURL.LOGIN)
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .permitAll()
                 .and()
             .logout()
-            .logoutSuccessUrl("/index")
+            .logoutSuccessUrl(ConstantsURL.SLASH + ConstantsURL.INDEX)
             .deleteCookies("JSESSIONID")
             .permitAll();
     }
@@ -73,9 +74,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/index").setViewName("index");
-        registry.addViewController("/").setViewName("index");
-        registry.addViewController("/login").setViewName("login");
+        registry.addViewController(ConstantsURL.SLASH + ConstantsURL.INDEX).setViewName(ConstantsURL.INDEX);
+        registry.addViewController(ConstantsURL.SLASH).setViewName(ConstantsURL.INDEX);
+        registry.addViewController(ConstantsURL.SLASH + ConstantsURL.LOGIN).setViewName(ConstantsURL.LOGIN);
     }
     
     @Bean

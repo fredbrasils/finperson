@@ -59,7 +59,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         user.setEnabled(true);
         user.setNonLocked(true);
         
-        Set<RoleEntity> roles = new HashSet<RoleEntity>(); 
+        Set<RoleEntity> roles = new HashSet<>(); 
         roles.add(roleRepository.findByRole(RoleEnum.ROLE_ADIM));
     		
         user.setRoles(roles);
@@ -70,11 +70,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 		
 		log.debug("Verify if email exists");
 		
-		UserEntity user = userRepository.findByEmail(email);
-		if (user != null) {
-			return true;
-		}
-		return false;
+		return (userRepository.findByEmail(email) != null);
+		
 	}
 
 }

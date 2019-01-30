@@ -6,11 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,6 +17,8 @@ import br.com.finperson.core.repository.EmailExistsException;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.util.ConstantsMessages;
+import br.com.finperson.util.ConstantsURL;
 import br.com.finperson.util.validation.annotation.PasswordMatches;
 
 @Controller
@@ -29,14 +30,14 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@RequestMapping(value = "/user/registration", method = RequestMethod.GET)
+	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_REGISTRATION)
 	public String showRegistrationForm(WebRequest requsest, Model model) {
 		UserDTO userDto = new UserDTO();
 		model.addAttribute("user", userDto);
-		return "user/registration";
+		return ConstantsURL.USER_REGISTRATION;
 	}
 
-	@RequestMapping(value = "/user/registration", method = RequestMethod.POST)
+	@PostMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_REGISTRATION)
 	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserDTO accountDto, BindingResult result,
 			WebRequest request, Errors errors) {
 
@@ -47,7 +48,7 @@ public class UserController {
 		}
 
 		if (registered == null) {
-			result.rejectValue("email", "message.regError");
+			result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MSG_EMAIL_EXISTS);
 		}
 
 	    if (result.hasErrors()) {
@@ -64,13 +65,13 @@ public class UserController {
 	    	}
 	    	
 	    	if(passwordMatches) {
-	    		result.rejectValue("password", "PasswordMatches.user");
+	    		result.rejectValue(ConstantsMessages.PASSWORD, ConstantsMessages.MSG_PASSWORD_MATCH);
 	    	}
 	    	
-	        return new ModelAndView("user/registration", "user", accountDto);
+	        return new ModelAndView(ConstantsURL.USER_REGISTRATION, "user", accountDto);
 	    } 
 	    else {
-	        return new ModelAndView("user/successRegister", "user", accountDto);
+	        return new ModelAndView(ConstantsURL.USER_SUCCESSREGISTER, "user", accountDto);
 	    }
 
 	}
