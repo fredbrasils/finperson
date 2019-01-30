@@ -1,6 +1,6 @@
 package br.com.finperson.util;
 
-public interface ConstantsMessages {
+public class ConstantsMessages {
 
 	public static final String EMAIL = "email";
 	public static final String PASSWORD = "password";

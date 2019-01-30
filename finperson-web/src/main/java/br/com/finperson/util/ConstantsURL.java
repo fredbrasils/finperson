@@ -1,6 +1,6 @@
 package br.com.finperson.util;
 
-public interface ConstantsURL {
+public class ConstantsURL {
 
 	public static final String SLASH = "/";
 	
