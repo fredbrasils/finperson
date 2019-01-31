@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,9 +27,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
+import br.com.finperson.core.security.repository.TokenRepository;
 import br.com.finperson.domain.RoleEntity;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,12 +44,17 @@ class UserServiceImplTest {
 	RoleRepository roleRepository;
 	
 	@Mock
+	TokenRepository tokenRepository;
+	
+	@Mock
 	PasswordEncoder passwordEncoder;
 	
 	@InjectMocks
 	UserServiceImpl userService;
 
 	UserEntity returnUser;
+	
+	TokenEntity returnToken;
 
 	Set<RoleEntity> returnRolesSet;
 	
@@ -63,6 +71,12 @@ class UserServiceImplTest {
 				.lastName("Brasil")
 				.email("fredbrasils@hotmail.com")
 				.roles(returnRolesSet)
+				.build();
+		
+		returnToken = TokenEntity.builder()
+				.id(1l)
+				.user(returnUser)
+				.token("token1234")
 				.build();
 	}
 
@@ -167,5 +181,51 @@ class UserServiceImplTest {
 		when(userRepository.findByEmail(any())).thenReturn(returnUser);
 		assertThrows(EmailExistsException.class, () -> userService.registerNewUserAccount(new UserDTO()));
 
+	}
+	
+	@DisplayName("Return User by token")
+	@Test
+	void returnUserByToken() {
+		
+		when(tokenRepository.findByToken(any())).thenReturn(returnToken);
+
+		UserEntity findedUser = userService.findUserByToken("token1234");
+
+		assertNotNull(findedUser);
+
+		verify(tokenRepository).findByToken(any());
+
+	}
+	
+	@DisplayName("Save User registered")
+	@Test
+	void saveUserRegistered() {
+		
+		userService.saveRegisteredUser(returnUser);
+
+		verify(userRepository).save(any());
+	}
+	
+	@DisplayName("Create token to user")
+	@Test
+	void createToken() {
+		
+		userService.createToken(returnUser, "token987");
+		
+		verify(tokenRepository).save(any());
+	}
+	
+	@DisplayName("Find token")
+	@Test
+	void findToken() {
+		
+		when(tokenRepository.findByToken(any())).thenReturn(returnToken);
+		
+		TokenEntity token = userService.findToken("toke");
+		
+		assertNotNull(token);
+
+		verify(tokenRepository).findByToken(any());
+		
 	}
 }

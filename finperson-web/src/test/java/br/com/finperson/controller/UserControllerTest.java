@@ -1,5 +1,6 @@
 package br.com.finperson.controller;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,14 +10,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -35,6 +37,9 @@ class UserControllerTest {
 
     MockMvc mockMvc;
 
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+    
     @BeforeEach
     void setUp() {
     	
@@ -56,7 +61,6 @@ class UserControllerTest {
 
     @DisplayName(value="Register a new user")
     @Test
-    @Disabled
     void registerUserAccount() throws Exception {
     	
     	when(userService.registerNewUserAccount(ArgumentMatchers.any())).thenReturn(UserEntity.builder().id(1l).firstName("Fred").build());
@@ -70,6 +74,30 @@ class UserControllerTest {
         		)
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/successRegister"))
+                .andExpect(model().attributeExists("user"))
+                ;
+
+        verify(userService).registerNewUserAccount(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Throw exception when try send email to a new user")
+    @Test
+    void throwExcptionWhenRegisterUser() throws Exception {
+    	
+    	when(userService.registerNewUserAccount(ArgumentMatchers.any())).thenReturn(UserEntity.builder().id(1l).firstName("Fred").build());
+
+    	Mockito.doCallRealMethod().when(eventPublisher).publishEvent(null);
+    	    	
+        mockMvc.perform(post("/user/registration")
+        		.param("firstName", "fred")
+        		.param("lastName", "santos")
+        		.param("email", "fredbrasils@hotmail.com")
+        		.param("password", "123")
+        		.param("matchingPassword", "123")
+        		)
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
                 .andExpect(model().attributeExists("user"))
                 ;
 

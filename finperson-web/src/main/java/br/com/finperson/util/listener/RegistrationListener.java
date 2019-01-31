@@ -38,15 +38,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 		String token = UUID.randomUUID().toString();
 		userService.createToken(user, token);
 
-//		String recipientAddress = user.getEmail();
-//		String subject = "Registration Confirmation";
-//		String confirmationUrl = event.getAppUrl() + "/regitrationConfirm.html?token=" + token;
-//		String message = messages.getMessage("message.regSucc", null, event.getLocale());
-
 		SimpleMailMessage email =  constructEmailMessage(event, user, token);
-//		email.setTo(recipientAddress);
-//		email.setSubject(subject);
-//		email.setText(message + " rn" + "http://localhost:8080" + confirmationUrl);
 		mailSender.send(email);
 	}
 	

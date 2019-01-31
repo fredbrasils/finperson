@@ -66,6 +66,20 @@ class EmailValidatorTest {
 		assertFalse(validator.isValid("", null));
 	}
 	
+	@DisplayName(value="This email is null and is permited")
+	@Test
+	void validNullEmail() {
+		EmailValidator validator = getEmailValidator(true);
+		assertTrue(validator.isValid(null, null));
+	}
+	
+	@DisplayName(value="This email is null and is not permited")
+	@Test
+	void notValidNullEmail() {
+		EmailValidator validator = getEmailValidator(false);
+		assertFalse(validator.isValid(null, null));
+	}
+	
 	private EmailValidator getEmailValidator(boolean acceptEmptyEmail) {
 		
 		EmailValidator validator = new EmailValidator();
