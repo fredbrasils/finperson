@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import br.com.finperson.core.repository.EmailExistsException;
+import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
 import br.com.finperson.domain.RoleEntity;

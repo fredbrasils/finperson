@@ -8,13 +8,15 @@ import javax.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.finperson.core.repository.EmailExistsException;
+import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.UserRepository;
+import br.com.finperson.core.security.repository.TokenRepository;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.RoleEntity;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,12 +27,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 	private PasswordEncoder passwordEncoder;
 	private UserRepository userRepository;
 	private RoleRepository roleRepository;
-
-	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+	private TokenRepository tokenRepository;
+	
+	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, 
+			TokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
+		
 		super(userRepository);
 		log.debug("Create UserServiceImpl");
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+		this.tokenRepository = tokenRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -56,22 +62,42 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
-        user.setEnabled(true);
+        user.setEnabled(false);
         user.setNonLocked(true);
         
         Set<RoleEntity> roles = new HashSet<>(); 
-        roles.add(roleRepository.findByRole(RoleEnum.ROLE_ADIM));
+        roles.add(roleRepository.findByRole(RoleEnum.ROLE_USER));
     		
         user.setRoles(roles);
         return userRepository.save(user);       
     }
 
 	private boolean emailExists(String email) {
-		
 		log.debug("Verify if email exists");
 		
 		return (userRepository.findByEmail(email) != null);
-		
+	}
+
+	@Override
+	public UserEntity findUserByToken(String token) {
+		UserEntity user = tokenRepository.findByToken(token).getUser();
+        return user;
+	}
+
+	@Override
+	public void saveRegisteredUser(UserEntity user) {
+		userRepository.save(user);
+	}
+
+	@Override
+	public void createToken(UserEntity user, String token) {
+		TokenEntity myToken = TokenEntity.builder().token(token).user(user).build();
+        tokenRepository.save(myToken);
+	}
+
+	@Override
+	public TokenEntity findToken(String token) {
+		return tokenRepository.findByToken(token);
 	}
 
 }

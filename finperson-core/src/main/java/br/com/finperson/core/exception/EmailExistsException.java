@@ -1,4 +1,4 @@
-package br.com.finperson.core.repository;
+package br.com.finperson.core.exception;
 
 public class EmailExistsException extends Exception {
 
