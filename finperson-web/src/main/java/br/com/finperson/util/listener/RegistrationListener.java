@@ -2,7 +2,6 @@ package br.com.finperson.util.listener;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -16,18 +15,23 @@ import br.com.finperson.domain.UserEntity;
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 
-	@Autowired
 	private UserService userService;
 
-	@Autowired
 	private MessageSource messages;
 
-	@Autowired
 	private JavaMailSender mailSender;
 
-	@Autowired
     private Environment env;
 	
+	public RegistrationListener(UserService userService, MessageSource messages, JavaMailSender mailSender,
+			Environment env) {
+		super();
+		this.userService = userService;
+		this.messages = messages;
+		this.mailSender = mailSender;
+		this.env = env;
+	}
+
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
 		this.confirmRegistration(event);
@@ -38,7 +42,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 		String token = UUID.randomUUID().toString();
 		userService.createToken(user, token);
 
-		SimpleMailMessage email =  constructEmailMessage(event, user, token);
+		SimpleMailMessage email = constructEmailMessage(event, user, token);
 		mailSender.send(email);
 	}
 	

@@ -2,6 +2,8 @@ package br.com.finperson.util;
 
 public class ConstantsURL {
 
+	private ConstantsURL() {}
+	
 	public static final String SLASH = "/";
 	
 	/** INDEX **/

@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.springframework.context.ApplicationEvent;
 
 import br.com.finperson.domain.UserEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ public class OnRegistrationCompleteEvent extends ApplicationEvent {
     private Locale locale;
     private UserEntity user;
  
+    @Builder
     public OnRegistrationCompleteEvent(
     		UserEntity user, Locale locale, String appUrl) {
         super(user);

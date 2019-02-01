@@ -6,7 +6,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -34,15 +33,15 @@ import br.com.finperson.util.validation.annotation.PasswordMatches;
 @Controller
 public class UserController {
 
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
 	
 	private final ApplicationEventPublisher eventPublisher;
 	private final UserService userService;
 
-	public UserController(UserService userService, ApplicationEventPublisher eventPublisher) {
+	public UserController(UserService userService, ApplicationEventPublisher eventPublisher, MessageSource messages) {
 		this.userService = userService;
 		this.eventPublisher = eventPublisher;
+		this.messages = messages;
 	}
 
 	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_REGISTRATION)
@@ -124,7 +123,8 @@ public class UserController {
 	    if (verificationToken == null) {
 	        String message = messages.getMessage("auth.message.invalidToken", null, locale);
 	        model.addAttribute("message", message);
-	        return "redirect:/badUser.html?lang=" + locale.getLanguage();
+	        //return "redirect:/badUser.html?lang=" + locale.getLanguage();
+	        return "redirect:/badUser";
 	    }
 	     
 	    UserEntity user = verificationToken.getUser();
@@ -132,7 +132,8 @@ public class UserController {
 	    if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
 	        String messageValue = messages.getMessage("auth.message.expired", null, locale);
 	        model.addAttribute("message", messageValue);
-	        return "redirect:/badUser.html?lang=" + locale.getLanguage();
+	      //return "redirect:/badUser.html?lang=" + locale.getLanguage();
+	        return "redirect:/badUser";
 	    } 
 	     
 	    user.setEnabled(true); 

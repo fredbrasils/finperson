@@ -1,13 +1,14 @@
 package br.com.finperson.controller;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,12 +20,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.security.domain.TokenEntity;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -39,6 +42,9 @@ class UserControllerTest {
 
     @Mock
     ApplicationEventPublisher eventPublisher;
+    
+    @Mock
+    MessageSource messages;
     
     @BeforeEach
     void setUp() {
@@ -162,6 +168,85 @@ class UserControllerTest {
                 ;
 
         verify(userService).registerNewUserAccount(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Confirmation register of a new user.")
+    @Test
+    void confirmRegisterUser() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(token);
+
+        mockMvc.perform(get("/user/registrationConfirm")
+        		.param("token", "token123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login"));
+
+        verify(userService).saveRegisteredUser(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Confirmation register denied because the token is invalid.")
+    @Test
+    void invalidToken() throws Exception {
+    	
+    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(null);
+    	
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+
+        mockMvc.perform(get("/user/registrationConfirm")
+        		.param("token", "token123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(view().name("redirect:/badUser"));
+
+        verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Confirmation register denied because the token is expired.")
+    @Test
+    void expiredToken() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.set(Calendar.YEAR, 2018);
+    	token.setExpiryDate(calendar.getTime());
+    	
+    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(token);
+
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	
+    	mockMvc.perform(get("/user/registrationConfirm")
+        		.param("token", "token123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(view().name("redirect:/badUser"));
+
+    	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 
     }
     
