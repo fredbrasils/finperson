@@ -5,12 +5,15 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import br.com.finperson.domain.BaseEntity;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,19 +35,21 @@ public class TokenEntity extends BaseEntity{
         super(id);
     }
 	
-    public TokenEntity(final Long id, final String token) {
+    public TokenEntity(final Long id, final String token,TypeEmailEnum typeEmail) {
     	super(id);
 
         this.token = token;
+        this.typeEmail = typeEmail;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 	
 	@Builder
-    public TokenEntity(final Long id,final String token, final UserEntity user) {
+    public TokenEntity(final Long id,final String token, final UserEntity user,TypeEmailEnum typeEmail) {
     	super(id);
 
         this.token = token;
         this.user = user;
+        this.typeEmail = typeEmail;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 	
@@ -55,6 +60,9 @@ public class TokenEntity extends BaseEntity{
     private UserEntity user;
      
     private Date expiryDate;
+    
+    @Enumerated(EnumType.STRING)
+    private TypeEmailEnum typeEmail;
     
     private Date calculateExpiryDate(int expiryTimeInMinutes) {
         Calendar cal = Calendar.getInstance();

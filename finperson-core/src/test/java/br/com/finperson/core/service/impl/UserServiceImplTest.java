@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import br.com.finperson.core.security.repository.TokenRepository;
 import br.com.finperson.domain.RoleEntity;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
 import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 
@@ -187,13 +189,13 @@ class UserServiceImplTest {
 	@Test
 	void returnUserByToken() {
 		
-		when(tokenRepository.findByToken(any())).thenReturn(returnToken);
+		when(tokenRepository.findByTokenAndTypeEmail(any(), eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(returnToken);
 
-		UserEntity findedUser = userService.findUserByToken("token1234");
+		UserEntity findedUser = userService.findUserByToken("token1234",TypeEmailEnum.CONFIRMATION_USER);
 
 		assertNotNull(findedUser);
 
-		verify(tokenRepository).findByToken(any());
+		verify(tokenRepository).findByTokenAndTypeEmail(any(), eq(TypeEmailEnum.CONFIRMATION_USER));
 
 	}
 	
@@ -210,7 +212,7 @@ class UserServiceImplTest {
 	@Test
 	void createToken() {
 		
-		userService.createToken(returnUser, "token987");
+		userService.createToken(returnUser, "token987",TypeEmailEnum.CONFIRMATION_USER);
 		
 		verify(tokenRepository).save(any());
 	}
@@ -219,13 +221,13 @@ class UserServiceImplTest {
 	@Test
 	void findToken() {
 		
-		when(tokenRepository.findByToken(any())).thenReturn(returnToken);
+		when(tokenRepository.findByTokenAndTypeEmail(any(), eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(returnToken);
 		
-		TokenEntity token = userService.findToken("toke");
+		TokenEntity token = userService.findToken("toke",TypeEmailEnum.CONFIRMATION_USER);
 		
 		assertNotNull(token);
 
-		verify(tokenRepository).findByToken(any());
+		verify(tokenRepository).findByTokenAndTypeEmail(any(), eq(TypeEmailEnum.CONFIRMATION_USER));
 		
 	}
 }

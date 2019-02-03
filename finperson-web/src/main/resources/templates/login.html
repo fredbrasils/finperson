@@ -8,7 +8,7 @@
     	
     	<div th:if="${session[SPRING_SECURITY_LAST_EXCEPTION]}" th:text="${session[SPRING_SECURITY_LAST_EXCEPTION]}">error</div>
         
-        <div th:if="${param.error != null and session[SPRING_SECURITY_LAST_EXCEPTION] != null}">
+        <div th:if="${param.error != null and session[SPRING_SECURITY_LAST_EXCEPTION] == null}">
             Invalid username and password.
         </div>
         
@@ -25,5 +25,7 @@
         <form th:action="@{/user/registration}">
             <div><input type="submit" value="Sign In"/></div>
         </form>
+        
+        <a th:href="@{/user/forgotPassword}" th:text="#{user.resetpassword.iforgotpassword}">I forgot my password</a>
     </body>
 </html>

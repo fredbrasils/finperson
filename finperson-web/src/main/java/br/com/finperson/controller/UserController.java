@@ -23,11 +23,13 @@ import org.springframework.web.servlet.ModelAndView;
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
+import br.com.finperson.security.domain.ResetPasswordDTO;
 import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 import br.com.finperson.util.ConstantsMessages;
 import br.com.finperson.util.ConstantsURL;
-import br.com.finperson.util.listener.OnRegistrationCompleteEvent;
+import br.com.finperson.util.listener.OnSendEmailEvent;
 import br.com.finperson.util.validation.annotation.PasswordMatches;
 
 @Controller
@@ -62,7 +64,7 @@ public class UserController {
 		}
 
 		if (registered == null) {
-			result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MSG_EMAIL_EXISTS);
+			result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MESSAGE_ERROR_EMAIL_EXISTS);
 		}
 
 		if (result.hasErrors()) {
@@ -88,9 +90,9 @@ public class UserController {
 
 			try {
 				String appUrl = getAppUrl(request);
-				eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), appUrl));
+				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER));
 			} catch (Exception me) {
-				return new ModelAndView("login", "user", accountDto);
+				return new ModelAndView(ConstantsURL.LOGIN, "user", accountDto);
 			}
 
 			return new ModelAndView(ConstantsURL.USER_SUCCESSREGISTER, "user", accountDto);
@@ -113,32 +115,65 @@ public class UserController {
 		return registered;
 	}
 
-	@GetMapping(value = "/user/registrationConfirm")
+	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.REGISTRATION_CONFIRM)
 	public String confirmRegistration
 	  (WebRequest request, Model model, @RequestParam("token") String token) {
 	  
 		Locale locale = request.getLocale();
 	     
-	    TokenEntity verificationToken = userService.findToken(token);
+	    TokenEntity verificationToken = userService.findToken(token, TypeEmailEnum.CONFIRMATION_USER);
 	    if (verificationToken == null) {
-	        String message = messages.getMessage("auth.message.invalidToken", null, locale);
+	        String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, locale);
 	        model.addAttribute("message", message);
-	        //return "redirect:/badUser.html?lang=" + locale.getLanguage();
-	        return "redirect:/badUser";
+	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
+	        return "redirect:/"+ ConstantsURL.BAD_USER;
 	    }
 	     
 	    UserEntity user = verificationToken.getUser();
 	    Calendar cal = Calendar.getInstance();
 	    if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-	        String messageValue = messages.getMessage("auth.message.expired", null, locale);
+	        String messageValue = messages.getMessage(ConstantsMessages.EXPIRED_TOKEN, null, locale);
 	        model.addAttribute("message", messageValue);
-	      //return "redirect:/badUser.html?lang=" + locale.getLanguage();
-	        return "redirect:/badUser";
+	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
+	        return "redirect:/"+ ConstantsURL.BAD_USER;
 	    } 
 	     
 	    user.setEnabled(true); 
 	    userService.saveRegisteredUser(user); 
-	    //return "redirect:/login.html?lang=" + request.getLocale().getLanguage(); 
-	    return "redirect:/login";
+	    /** return "redirect:/login.html?lang=" + request.getLocale().getLanguage(); **/
+	    return "redirect:/"+ConstantsURL.LOGIN;
+	}
+	
+	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_FORGOT_PASSWORD)
+	public String resetPasswordForm(WebRequest requsest, Model model) {
+		model.addAttribute("resetPass", new ResetPasswordDTO());
+		return ConstantsURL.USER_FORGOT_PASSWORD;
+	}
+	
+	@PostMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_MESSAGE_RESET_PASSWORD)
+	public ModelAndView resetPassword(@ModelAttribute("resetPass") @Valid ResetPasswordDTO resetPassDTO, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+
+		UserEntity registered = userService.findByEmail(resetPassDTO.getEmail());
+		
+		if (!result.hasErrors() && registered == null) {
+			result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MESSAGE_ERROR_EMAIL_NOT_EXISTS);
+		}
+
+		if (result.hasErrors()) {
+			return new ModelAndView(ConstantsURL.USER_FORGOT_PASSWORD, "resetPass", resetPassDTO);
+		} else {
+
+			try {
+				String appUrl = getAppUrl(request);
+				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.RESET_PASSWORD));
+			} catch (Exception me) {
+				result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MESSAGE_ERROR_SEND_EMAIL_CHANGE_PASSWORD);
+				return new ModelAndView(ConstantsURL.USER_FORGOT_PASSWORD, "resetPass", resetPassDTO);
+			}
+
+			return new ModelAndView(ConstantsURL.USER_MESSAGE_RESET_PASSWORD);
+		}
+
 	}
 }

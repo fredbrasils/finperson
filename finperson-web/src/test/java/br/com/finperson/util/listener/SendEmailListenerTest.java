@@ -22,9 +22,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
 
 @ExtendWith(MockitoExtension.class)
-class RegistrationListenerTest {
+class SendEmailListenerTest {
 
 	@Mock
 	UserService userService;
@@ -39,16 +40,17 @@ class RegistrationListenerTest {
     Environment env;
 	
 	@InjectMocks
-	RegistrationListener registrationListener;
+	SendEmailListener registrationListener;
 
-	OnRegistrationCompleteEvent event;
+	OnSendEmailEvent event;
 
 	@BeforeEach
     void setUp() {
     	
-		event = OnRegistrationCompleteEvent.builder()
+		event = OnSendEmailEvent.builder()
 				.appUrl("http://localhost")
 				.user(UserEntity.builder().build())
+				.typeEmail(TypeEmailEnum.CONFIRMATION_USER)
 				.build();
     }
 	
@@ -60,7 +62,7 @@ class RegistrationListenerTest {
 		
 		registrationListener.onApplicationEvent(event);
 		
-    	verify(userService, times(1)).createToken(ArgumentMatchers.any(UserEntity.class),ArgumentMatchers.anyString());
+    	verify(userService, times(1)).createToken(ArgumentMatchers.any(UserEntity.class),ArgumentMatchers.anyString(),ArgumentMatchers.any(TypeEmailEnum.class));
     	
     	verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
 

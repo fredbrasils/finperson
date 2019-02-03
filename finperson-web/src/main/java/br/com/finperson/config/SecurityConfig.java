@@ -2,7 +2,6 @@ package br.com.finperson.config;
 
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -26,11 +25,22 @@ import br.com.finperson.util.ConstantsURL;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer{
 
+	private UserDetailsServiceImpl userDetailsService;
+	
+	public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+		super();
+		this.userDetailsService = userDetailsService;
+	}
+
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers(ConstantsURL.SLASH, ConstantsURL.SLASH + ConstantsURL.INDEX,"/user/**").permitAll()
+                .antMatchers(ConstantsURL.SLASH, ConstantsURL.SLASH + ConstantsURL.INDEX
+                		,"/user/registration"
+                		,"/user/forgotPassword"
+                		,"/user/messageResetPassword"
+                		,"/user/registrationConfirm").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .formLogin()
@@ -44,9 +54,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
             .deleteCookies("JSESSIONID")
             .permitAll();
     }
-
-	@Autowired
-	private UserDetailsServiceImpl userDetailsService;
 	 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) 
@@ -63,21 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	    return authProvider;
 	}
 	
-	/*
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-             User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
-    */
-    
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController(ConstantsURL.SLASH + ConstantsURL.INDEX).setViewName(ConstantsURL.INDEX);

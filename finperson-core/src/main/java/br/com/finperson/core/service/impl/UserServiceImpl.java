@@ -16,6 +16,7 @@ import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.RoleEntity;
 import br.com.finperson.domain.UserEntity;
 import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
 import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -72,16 +73,15 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         return userRepository.save(user);       
     }
 
-	private boolean emailExists(String email) {
+	public boolean emailExists(String email) {
 		log.debug("Verify if email exists");
 		
 		return (userRepository.findByEmail(email) != null);
 	}
 
 	@Override
-	public UserEntity findUserByToken(String token) {
-		UserEntity user = tokenRepository.findByToken(token).getUser();
-        return user;
+	public UserEntity findUserByToken(String token,TypeEmailEnum typeEmail) {
+		return tokenRepository.findByTokenAndTypeEmail(token, typeEmail).getUser();
 	}
 
 	@Override
@@ -90,14 +90,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 	}
 
 	@Override
-	public void createToken(UserEntity user, String token) {
-		TokenEntity myToken = TokenEntity.builder().token(token).user(user).build();
+	public void createToken(UserEntity user, String token,TypeEmailEnum typeEmail) {
+		TokenEntity myToken = TokenEntity.builder().token(token).user(user).typeEmail(typeEmail).build();
         tokenRepository.save(myToken);
 	}
 
 	@Override
-	public TokenEntity findToken(String token) {
-		return tokenRepository.findByToken(token);
+	public TokenEntity findToken(String token,TypeEmailEnum typeEmail) {
+		return tokenRepository.findByTokenAndTypeEmail(token,typeEmail);
 	}
 
 }

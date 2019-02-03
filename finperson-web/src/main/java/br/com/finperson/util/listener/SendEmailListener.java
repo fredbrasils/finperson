@@ -13,8 +13,10 @@ import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
 
 @Component
-public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> {
 
+	private static final String SUPPORT_EMAIL = "support.email";
+	
 	private UserService userService;
 
 	private MessageSource messages;
@@ -23,7 +25,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
     private Environment env;
 	
-	public RegistrationListener(UserService userService, MessageSource messages, JavaMailSender mailSender,
+	public SendEmailListener(UserService userService, MessageSource messages, JavaMailSender mailSender,
 			Environment env) {
 		super();
 		this.userService = userService;
@@ -33,29 +35,29 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 	}
 
 	@Override
-	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+	public void onApplicationEvent(OnSendEmailEvent event) {
 		this.confirmRegistration(event);
 	}
 
-	private void confirmRegistration(OnRegistrationCompleteEvent event) {
+	private void confirmRegistration(OnSendEmailEvent event) {
 		UserEntity user = event.getUser();
 		String token = UUID.randomUUID().toString();
-		userService.createToken(user, token);
+		userService.createToken(user, token, event.getTypeEmail());
 
 		SimpleMailMessage email = constructEmailMessage(event, user, token);
 		mailSender.send(email);
 	}
 	
-	private final SimpleMailMessage constructEmailMessage(final OnRegistrationCompleteEvent event, final UserEntity user, final String token) {
+	private final SimpleMailMessage constructEmailMessage(final OnSendEmailEvent event, final UserEntity user, final String token) {
         final String recipientAddress = user.getEmail();
-        final String subject = "Registration Confirmation";
-        final String confirmationUrl = event.getAppUrl() + "/user/registrationConfirm?token=" + token;
-        final String message = messages.getMessage("message.regSucc", null, event.getLocale());
+        final String subject = messages.getMessage(event.getTypeEmail().getSubject(), null, event.getLocale());
+        final String confirmationUrl = event.getAppUrl() + event.getTypeEmail().getUrl() + token;
+        final String message = messages.getMessage(event.getTypeEmail().getMessage(), new String[] {confirmationUrl}, event.getLocale());
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + " \r\n" + confirmationUrl);
-        email.setFrom(env.getProperty("support.email"));
+        email.setText(message);
+        email.setFrom(env.getProperty(SUPPORT_EMAIL));
         return email;
     }
 }

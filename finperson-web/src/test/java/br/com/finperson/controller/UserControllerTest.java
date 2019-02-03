@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.domain.enumm.TypeEmailEnum;
 import br.com.finperson.security.domain.TokenEntity;
 
 @ExtendWith(MockitoExtension.class)
@@ -187,7 +188,7 @@ class UserControllerTest {
 				.token("token1234")
 				.build();
 		
-    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(token);
+    	when(userService.findToken(ArgumentMatchers.anyString(), ArgumentMatchers.eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(token);
 
         mockMvc.perform(get("/user/registrationConfirm")
         		.param("token", "token123"))
@@ -202,7 +203,7 @@ class UserControllerTest {
     @Test
     void invalidToken() throws Exception {
     	
-    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(null);
+    	when(userService.findToken(ArgumentMatchers.anyString(), ArgumentMatchers.eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(null);
     	
     	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
 
@@ -236,7 +237,7 @@ class UserControllerTest {
     	calendar.set(Calendar.YEAR, 2018);
     	token.setExpiryDate(calendar.getTime());
     	
-    	when(userService.findToken(ArgumentMatchers.anyString())).thenReturn(token);
+    	when(userService.findToken(ArgumentMatchers.anyString(), ArgumentMatchers.eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(token);
 
     	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
     	
@@ -250,4 +251,82 @@ class UserControllerTest {
 
     }
     
+    @DisplayName(value="Show 'I forgot password' page")
+    @Test
+    void showIForgotPasswordForm() throws Exception {
+    	
+        mockMvc.perform(get("/user/forgotPassword"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/forgotPassword"))
+                .andExpect(model().attributeExists("resetPass"));
+
+    }
+    
+    @DisplayName(value="Send email to confirme reset of the password")
+    @Test
+    void sendEmailToConfirmResetPassword() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	when(userService.findByEmail(anyString())).thenReturn(user);
+    	
+        mockMvc.perform(post("/user/messageResetPassword")
+        		.param("email", "fredbrasils@hotmail.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/messageResetPassword"));
+
+    }
+    
+    @DisplayName(value="Not Send email to a user that doesn't exists")
+    @Test
+    void notSendEmailUserDoesntExists() throws Exception {
+    	
+    	when(userService.findByEmail(anyString())).thenReturn(null);
+    	
+        mockMvc.perform(post("/user/messageResetPassword")
+        		.param("email", "xxxx@hotmail.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/forgotPassword"))
+                .andExpect(model().attributeExists("resetPass"));
+
+    }
+    
+    @DisplayName(value="Not Send email to a invalid email")
+    @Test
+    void notSendEmailToInvalidEmail() throws Exception {
+    	
+        mockMvc.perform(post("/user/messageResetPassword")
+        		.param("email", "email.example.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/forgotPassword"))
+                .andExpect(model().attributeExists("resetPass"));
+
+        verify(userService, times(0)).emailExists(ArgumentMatchers.anyString());
+    }
+    
+    @DisplayName(value="Throw exception when try send email to reset password")
+    @Test
+    void throwExceptionWhenTrySendEmailToResetPassword() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	when(userService.findByEmail(anyString())).thenReturn(user);
+    	
+    	Mockito.doCallRealMethod().when(eventPublisher).publishEvent(null);
+    	
+        mockMvc.perform(post("/user/messageResetPassword")
+        		.param("email", "fredbrasils@hotmail.com"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/forgotPassword"))
+                .andExpect(model().attributeExists("resetPass"));
+
+    }
 }
