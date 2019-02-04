@@ -51,7 +51,7 @@ public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> 
 	private final SimpleMailMessage constructEmailMessage(final OnSendEmailEvent event, final UserEntity user, final String token) {
         final String recipientAddress = user.getEmail();
         final String subject = messages.getMessage(event.getTypeEmail().getSubject(), null, event.getLocale());
-        final String confirmationUrl = event.getAppUrl() + event.getTypeEmail().getUrl() + token;
+        final String confirmationUrl = event.getAppUrl() + addParams(event.getTypeEmail().getUrl(), token, event.getParams());
         final String message = messages.getMessage(event.getTypeEmail().getMessage(), new String[] {confirmationUrl}, event.getLocale());
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
@@ -60,4 +60,21 @@ public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> 
         email.setFrom(env.getProperty(SUPPORT_EMAIL));
         return email;
     }
+
+	private String addParams(String url, String token, Object[] params) {
+		
+		int count = 0;
+		url = url.replace("{"+count+"}", token);
+		
+		if(params != null) {
+			for(Object param : params) {
+				count++;
+				url = url.replace("{"+count+"}", param.toString());
+			}
+		}		
+		
+		return url;
+	}
+	
+	
 }

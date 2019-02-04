@@ -10,8 +10,8 @@ import lombok.Getter;
 @Getter
 public enum TypeEmailEnum {
 
-	CONFIRMATION_USER(USER_REGISTRATION_SUBJECT, "/user/registrationConfirm?token=", USER_REGISTRATION_MESSAGE),
-	RESET_PASSWORD(USER_RESET_PASSWORD_SUBJECT, "/user/resetPasswordConfirm?token=", USER_RESET_PASSWORD_MESSAGE);
+	CONFIRMATION_USER(USER_REGISTRATION_SUBJECT, "/user/registrationConfirm?token={0}", USER_REGISTRATION_MESSAGE),
+	RESET_PASSWORD(USER_RESET_PASSWORD_SUBJECT, "/user/resetPasswordConfirm?token={0}&id={1}", USER_RESET_PASSWORD_MESSAGE);
 	
 	private String subject;
 	private String url;

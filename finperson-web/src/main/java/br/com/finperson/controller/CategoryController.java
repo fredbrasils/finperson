@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 
 import br.com.finperson.core.service.CategoryService;
-import br.com.finperson.util.ConstantsURL;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,10 +24,10 @@ public class CategoryController {
         dataBinder.setDisallowedFields("id");
     }
     
-    @GetMapping(value = ConstantsURL.SLASH + ConstantsURL.CATEGORY_LIST)
+    @GetMapping(value = "/category/list")
     public String findCategories(Model model){
     	log.debug("CategoryController::findCategories");
         model.addAttribute("categories", categoryService.findAll());
-        return ConstantsURL.CATEGORY_CATEGORIES;
+        return "category/categories";
     }
 }

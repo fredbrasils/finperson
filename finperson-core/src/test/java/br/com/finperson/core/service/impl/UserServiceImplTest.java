@@ -230,4 +230,16 @@ class UserServiceImplTest {
 		verify(tokenRepository).findByTokenAndTypeEmail(any(), eq(TypeEmailEnum.CONFIRMATION_USER));
 		
 	}
+	
+	@DisplayName("Update password")
+	@Test
+	void updatePassword() {
+		
+		when(userRepository.findById(anyLong())).thenReturn(Optional.of(returnUser));
+		
+		userService.updatePassword("1234", returnUser);
+		
+		verify(userRepository).save(any(UserEntity.class));
+		
+	}
 }

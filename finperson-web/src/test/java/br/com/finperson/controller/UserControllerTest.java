@@ -1,6 +1,11 @@
 package br.com.finperson.controller;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -211,7 +216,7 @@ class UserControllerTest {
         		.param("token", "token123"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(model().attributeExists("message"))
-                .andExpect(view().name("redirect:/badUser"));
+                .andExpect(view().name("redirect:/user/badUser"));
 
         verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 
@@ -245,7 +250,7 @@ class UserControllerTest {
         		.param("token", "token123"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(model().attributeExists("message"))
-                .andExpect(view().name("redirect:/badUser"));
+                .andExpect(view().name("redirect:/user/badUser"));
 
     	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 
@@ -327,6 +332,169 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/forgotPassword"))
                 .andExpect(model().attributeExists("resetPass"));
+    }
+    
+    @DisplayName(value="Show update password's page.")
+    @Test
+    void showUpdatePasswordPage() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString())).thenReturn(token);
+
+        mockMvc.perform(get("/user/resetPasswordConfirm")
+        		.param("token", "token123")
+        		.param("id", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/updatePassword"));
+
+        verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+
+    }
+    
+    @DisplayName(value="Don't show update password's page because token invalid")
+    @Test
+    void dontShowUpdatePasswordPageTokenInvalid() throws Exception {
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString())).thenReturn(null);
+
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	
+        mockMvc.perform(get("/user/resetPasswordConfirm")
+        		.param("token", "token123")
+        		.param("id", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/user/badUser"))
+                .andExpect(model().attributeExists("message"));
+
+        verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+
+    }
+    
+    @DisplayName(value="Don't show update password's page because token expired")
+    @Test
+    void dontShowUpdatePasswordPageTokenExpired() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.set(Calendar.YEAR, 2018);
+    	token.setExpiryDate(calendar.getTime());
+		
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString())).thenReturn(token);
+
+        mockMvc.perform(get("/user/resetPasswordConfirm")
+        		.param("token", "token123")
+        		.param("id", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/user/badUser"))
+                .andExpect(model().attributeExists("message"));
+
+        verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+    }
+    
+    @DisplayName(value="Update password's user.")
+    @Test
+    void updatePassword() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString())).thenReturn(token);
+
+        mockMvc.perform(post("/user/updatePassword")
+        		.param("token", "token123")
+        		.param("id", "1")
+        		.param("firstName", "fred")
+        		.param("lastName", "santos")
+        		.param("email", "fredbrasils@hotmail.com")
+        		.param("password", "123")
+        		.param("matchingPassword", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));
+
+        verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+        
+        verify(userService).updatePassword(ArgumentMatchers.anyString(), any(UserEntity.class));
+
+    }
+    
+    @DisplayName(value="Update password's user because password doesn't match.")
+    @Test
+    void notUpdatePasswordNotMatch() throws Exception {
+    	
+        mockMvc.perform(post("/user/updatePassword")
+        		.param("token", "token123")
+        		.param("id", "1")
+        		.param("firstName", "fred")
+        		.param("lastName", "santos")
+        		.param("email", "fredbrasils@hotmail.com")
+        		.param("password", "123")
+        		.param("matchingPassword", "1234"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/updatePassword"))
+                .andExpect(model().attributeExists("user"));
+
+        verify(userService, times(0)).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+        
+        verify(userService, times(0)).updatePassword(ArgumentMatchers.anyString(), any(UserEntity.class));
+
+    }
+    
+    @DisplayName(value="Update password's user because user doesn't exist.")
+    @Test
+    void notUpdatePasswordBecauseUserNotExists() throws Exception {
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString())).thenReturn(null);
+    	
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	
+    	mockMvc.perform(post("/user/updatePassword")
+        		.param("token", "token123")
+        		.param("id", "1")
+        		.param("firstName", "fred")
+        		.param("lastName", "santos")
+        		.param("email", "fredbrasils@hotmail.com")
+        		.param("password", "123")
+        		.param("matchingPassword", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/badUser"))
+                .andExpect(model().attributeExists("message"));
+
+        verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
+        
+        verify(userService, times(0)).updatePassword(ArgumentMatchers.anyString(), any(UserEntity.class));
 
     }
 }

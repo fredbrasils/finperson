@@ -42,10 +42,8 @@ public class UserEntity extends BaseEntity{
 		this.roles = roles;
 	}
 	
-	
 	@Column
     private String firstName;
-    
 
 	@Column
     private String lastName;

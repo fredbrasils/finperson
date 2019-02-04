@@ -19,7 +19,6 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import br.com.finperson.core.service.security.impl.UserDetailsServiceImpl;
-import br.com.finperson.util.ConstantsURL;
 
 @Configuration
 @EnableWebSecurity
@@ -36,21 +35,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers(ConstantsURL.SLASH, ConstantsURL.SLASH + ConstantsURL.INDEX
+                .antMatchers("/", "/index"
                 		,"/user/registration"
                 		,"/user/forgotPassword"
                 		,"/user/messageResetPassword"
-                		,"/user/registrationConfirm").permitAll()
+                		,"/user/registrationConfirm",
+                		"/user/resetPasswordConfirm").permitAll()
+                .antMatchers("/user/updatePassword").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
                 .anyRequest().authenticated()
+                //.hasAnyRole(RoleEnum.ROLE_ADIM.name(),RoleEnum.ROLE_USER.name(),RoleEnum.ROLE_GUEST.name())
                 .and()
             .formLogin()
-                .loginPage(ConstantsURL.SLASH + ConstantsURL.LOGIN)
+                .loginPage("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .permitAll()
                 .and()
             .logout()
-            .logoutSuccessUrl(ConstantsURL.SLASH + ConstantsURL.INDEX)
+            .logoutSuccessUrl("/index")
             .deleteCookies("JSESSIONID")
             .permitAll();
     }
@@ -72,9 +74,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController(ConstantsURL.SLASH + ConstantsURL.INDEX).setViewName(ConstantsURL.INDEX);
-        registry.addViewController(ConstantsURL.SLASH).setViewName(ConstantsURL.INDEX);
-        registry.addViewController(ConstantsURL.SLASH + ConstantsURL.LOGIN).setViewName(ConstantsURL.LOGIN);
+        registry.addViewController("/index").setViewName("index");
+        registry.addViewController("/").setViewName("index");
+        registry.addViewController("/login").setViewName("login");
     }
     
     @Bean

@@ -20,16 +20,18 @@ public class OnSendEmailEvent extends ApplicationEvent {
     private Locale locale;
     private UserEntity user;
     private TypeEmailEnum typeEmail;
+    private Object[] params;
  
     @Builder
     public OnSendEmailEvent(
-    		UserEntity user, Locale locale, String appUrl, TypeEmailEnum typeEmail) {
+    		UserEntity user, Locale locale, String appUrl, TypeEmailEnum typeEmail,Object[] params) {
         super(user);
          
         this.user = user;
         this.locale = locale;
         this.appUrl = appUrl;
         this.typeEmail = typeEmail;
+        this.params = params;
     }
      
 }

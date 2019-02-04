@@ -1,5 +1,6 @@
 package br.com.finperson.controller;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -8,6 +9,10 @@ import javax.validation.Valid;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,7 +33,6 @@ import br.com.finperson.security.domain.ResetPasswordDTO;
 import br.com.finperson.security.domain.TokenEntity;
 import br.com.finperson.security.domain.UserDTO;
 import br.com.finperson.util.ConstantsMessages;
-import br.com.finperson.util.ConstantsURL;
 import br.com.finperson.util.listener.OnSendEmailEvent;
 import br.com.finperson.util.validation.annotation.PasswordMatches;
 
@@ -46,14 +50,14 @@ public class UserController {
 		this.messages = messages;
 	}
 
-	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_REGISTRATION)
+	@GetMapping(value = "/user/registration")
 	public String showRegistrationForm(WebRequest requsest, Model model) {
 		UserDTO userDto = new UserDTO();
 		model.addAttribute("user", userDto);
-		return ConstantsURL.USER_REGISTRATION;
+		return "user/registration";
 	}
 
-	@PostMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_REGISTRATION)
+	@PostMapping(value = "/user/registration")
 	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserDTO accountDto, BindingResult result,
 			HttpServletRequest request, Errors errors) {
 
@@ -84,18 +88,18 @@ public class UserController {
 				result.rejectValue(ConstantsMessages.PASSWORD, ConstantsMessages.MSG_PASSWORD_MATCH);
 			}
 
-			return new ModelAndView(ConstantsURL.USER_REGISTRATION, "user", accountDto);
+			return new ModelAndView("user/registration", "user", accountDto);
 
 		} else {
 
 			try {
 				String appUrl = getAppUrl(request);
-				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER));
+				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER,null));
 			} catch (Exception me) {
-				return new ModelAndView(ConstantsURL.LOGIN, "user", accountDto);
+				return new ModelAndView("login", "user", accountDto);
 			}
 
-			return new ModelAndView(ConstantsURL.USER_SUCCESSREGISTER, "user", accountDto);
+			return new ModelAndView("user/successRegister", "user", accountDto);
 		}
 
 	}
@@ -115,7 +119,7 @@ public class UserController {
 		return registered;
 	}
 
-	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.REGISTRATION_CONFIRM)
+	@GetMapping(value = "/user/registrationConfirm")
 	public String confirmRegistration
 	  (WebRequest request, Model model, @RequestParam("token") String token) {
 	  
@@ -126,7 +130,7 @@ public class UserController {
 	        String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, locale);
 	        model.addAttribute("message", message);
 	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
-	        return "redirect:/"+ ConstantsURL.BAD_USER;
+	        return "redirect:/user/badUser";
 	    }
 	     
 	    UserEntity user = verificationToken.getUser();
@@ -135,22 +139,22 @@ public class UserController {
 	        String messageValue = messages.getMessage(ConstantsMessages.EXPIRED_TOKEN, null, locale);
 	        model.addAttribute("message", messageValue);
 	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
-	        return "redirect:/"+ ConstantsURL.BAD_USER;
+	        return "redirect:/user/badUser";
 	    } 
 	     
 	    user.setEnabled(true); 
 	    userService.saveRegisteredUser(user); 
 	    /** return "redirect:/login.html?lang=" + request.getLocale().getLanguage(); **/
-	    return "redirect:/"+ConstantsURL.LOGIN;
+	    return "redirect:/login";
 	}
 	
-	@GetMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_FORGOT_PASSWORD)
+	@GetMapping(value = "/user/forgotPassword")
 	public String resetPasswordForm(WebRequest requsest, Model model) {
 		model.addAttribute("resetPass", new ResetPasswordDTO());
-		return ConstantsURL.USER_FORGOT_PASSWORD;
+		return "user/forgotPassword";
 	}
 	
-	@PostMapping(value = ConstantsURL.SLASH + ConstantsURL.USER_MESSAGE_RESET_PASSWORD)
+	@PostMapping(value = "/user/messageResetPassword")
 	public ModelAndView resetPassword(@ModelAttribute("resetPass") @Valid ResetPasswordDTO resetPassDTO, BindingResult result,
 			HttpServletRequest request, Errors errors) {
 
@@ -161,19 +165,103 @@ public class UserController {
 		}
 
 		if (result.hasErrors()) {
-			return new ModelAndView(ConstantsURL.USER_FORGOT_PASSWORD, "resetPass", resetPassDTO);
+			return new ModelAndView("user/forgotPassword", "resetPass", resetPassDTO);
 		} else {
 
 			try {
 				String appUrl = getAppUrl(request);
-				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.RESET_PASSWORD));
+				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.RESET_PASSWORD, new Object[] {registered.getId()}));
 			} catch (Exception me) {
 				result.rejectValue(ConstantsMessages.EMAIL, ConstantsMessages.MESSAGE_ERROR_SEND_EMAIL_CHANGE_PASSWORD);
-				return new ModelAndView(ConstantsURL.USER_FORGOT_PASSWORD, "resetPass", resetPassDTO);
+				return new ModelAndView("user/forgotPassword", "resetPass", resetPassDTO);
 			}
 
-			return new ModelAndView(ConstantsURL.USER_MESSAGE_RESET_PASSWORD);
+			return new ModelAndView("user/messageResetPassword");
+		}
+	}
+	
+	@GetMapping(value = "/user/resetPasswordConfirm")
+	public String showUpdatePasswordPage(Locale locale, Model model, 
+	  @RequestParam("id") Long id, @RequestParam("token") String token) {
+	    
+		TokenEntity tokenUser = userService.findByUserIdAndToken(id, token);
+	    
+	    if (tokenUser == null) {
+	    	String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, locale);
+	        model.addAttribute("message", message);
+	        return "redirect:/user/badUser";
+	    }
+	    
+	    Calendar cal = Calendar.getInstance();
+	    if ((tokenUser.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+	    	String message = messages.getMessage(ConstantsMessages.EXPIRED_TOKEN, null, locale);
+	        model.addAttribute("message", message);
+	        return "redirect:/user/badUser";
+	    }
+	    
+	    Authentication auth = 
+	    		new UsernamePasswordAuthenticationToken( tokenUser.getUser(), 
+	    				null, Arrays.asList(new SimpleGrantedAuthority("CHANGE_PASSWORD_PRIVILEGE")));
+	    SecurityContextHolder.getContext().setAuthentication(auth);
+	    	 
+	    model.addAttribute("user", convertToUserDTO(tokenUser));
+	    return "user/updatePassword";
+	}
+	
+	private UserDTO convertToUserDTO(TokenEntity token) {
+		UserDTO user = new UserDTO();
+		
+		user.setId(token.getUser().getId());
+		user.setFirstName(token.getUser().getFirstName());
+		user.setLastName(token.getUser().getLastName());
+		user.setEmail(token.getUser().getEmail());
+		user.setToken(token.getToken());
+		
+		return user;
+	}
+	
+	@PostMapping(value = "/user/updatePassword")
+	public ModelAndView updatePassword(@ModelAttribute("user") @Valid UserDTO user, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+
+		if (!result.hasErrors()) {
+
+			TokenEntity tokenUser = userService.findByUserIdAndToken(user.getId(), user.getToken());
+	
+			if (tokenUser == null) {
+				ModelAndView modelView = new ModelAndView("user/badUser");
+				String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, request.getLocale());
+				modelView.addObject("message", message);
+		        return modelView;
+			}
+		
+			userService.updatePassword(user.getPassword(), tokenUser.getUser());
+			
+			return new ModelAndView("login", "user", new UserDTO());
+
+		}else {
+			
+			boolean passwordMatches = false;
+
+			for (Object object : result.getAllErrors()) {
+				if (object instanceof ObjectError) {
+					ObjectError objectError = (ObjectError) object;
+
+					if (objectError.getCode().equals(PasswordMatches.class.getSimpleName())) {
+						passwordMatches = true;
+					}
+				}
+			}
+
+			if (passwordMatches) {
+				result.rejectValue(ConstantsMessages.PASSWORD, ConstantsMessages.MSG_PASSWORD_MATCH);
+			}
+			
+			ModelAndView modelView = new ModelAndView("user/updatePassword");
+			modelView.addObject("user", user);
+		    return modelView;
 		}
 
 	}
+	
 }

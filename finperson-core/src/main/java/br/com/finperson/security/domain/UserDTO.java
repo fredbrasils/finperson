@@ -19,6 +19,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserDTO {
 
+	private Long id;
+	
 	@NotNull
     @NotEmpty
     private String firstName;
@@ -36,4 +38,6 @@ public class UserDTO {
     @NotNull
     @NotEmpty
     private String email;
+    
+    private String token;
 }

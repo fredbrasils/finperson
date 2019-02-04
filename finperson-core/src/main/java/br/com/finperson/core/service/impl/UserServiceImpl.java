@@ -100,4 +100,22 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 		return tokenRepository.findByTokenAndTypeEmail(token,typeEmail);
 	}
 
+	@Override
+	public TokenEntity findByUserIdAndToken(Long id, String token) {
+		return tokenRepository.findByUserIdAndToken(id,token);
+	}
+
+	@Transactional
+    @Override
+	public void updatePassword(String password, UserEntity user) {
+		
+		log.debug("Update password");
+		
+        UserEntity userRegistered = findById(user.getId());
+        
+        userRegistered.setPassword(passwordEncoder.encode(password));
+        	
+        userRepository.save(userRegistered);
+	}
+
 }
