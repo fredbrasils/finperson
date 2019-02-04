@@ -51,6 +51,7 @@ class SendEmailListenerTest {
 				.appUrl("http://localhost")
 				.user(UserEntity.builder().build())
 				.typeEmail(TypeEmailEnum.CONFIRMATION_USER)
+				.params(new Object[] {"1"})
 				.build();
     }
 	

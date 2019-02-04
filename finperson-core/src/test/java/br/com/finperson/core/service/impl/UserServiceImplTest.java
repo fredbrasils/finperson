@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
@@ -241,5 +243,16 @@ class UserServiceImplTest {
 		
 		verify(userRepository).save(any(UserEntity.class));
 		
+	}
+	
+	@DisplayName("Find token by user id and token's number")
+	@Test
+	void testFindByUserIdAndToken() {
+		
+		when(userService.findByUserIdAndToken(anyLong(),anyString())).thenReturn(returnToken);
+
+		TokenEntity tok = userService.findByUserIdAndToken(1L, "token");
+
+		assertNotNull(tok);
 	}
 }
