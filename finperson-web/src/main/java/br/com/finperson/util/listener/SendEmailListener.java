@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.domain.UserEntity;
+import br.com.finperson.security.domain.TokenEntity;
 
 @Component
 public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> {
@@ -42,7 +43,14 @@ public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> 
 	private void confirmRegistration(OnSendEmailEvent event) {
 		UserEntity user = event.getUser();
 		String token = UUID.randomUUID().toString();
-		userService.createToken(user, token, event.getTypeEmail());
+		
+		TokenEntity tk = userService.findToken(user, event.getTypeEmail());
+		if(tk == null) {
+			userService.createToken(user, token, event.getTypeEmail());
+		}else {
+			TokenEntity myToken = TokenEntity.builder().id(tk.getId()).token(token).user(user).typeEmail(event.getTypeEmail()).build();
+			userService.saveToken(myToken);
+		}
 
 		SimpleMailMessage email = constructEmailMessage(event, user, token);
 		mailSender.send(email);

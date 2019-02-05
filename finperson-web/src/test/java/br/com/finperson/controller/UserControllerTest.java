@@ -214,15 +214,15 @@ class UserControllerTest {
 
         mockMvc.perform(get("/user/registrationConfirm")
         		.param("token", "token123"))
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().isOk())
                 .andExpect(model().attributeExists("message"))
-                .andExpect(view().name("redirect:/user/badUser"));
+                .andExpect(view().name("user/badUser"));
 
         verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 
     }
     
-    @DisplayName(value="Confirmation register denied because the token is expired.")
+    @DisplayName(value="Confirmation register denied because the token is expired. A new token is sended.")
     @Test
     void expiredToken() throws Exception {
     	
@@ -248,9 +248,9 @@ class UserControllerTest {
     	
     	mockMvc.perform(get("/user/registrationConfirm")
         		.param("token", "token123"))
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().isOk())
                 .andExpect(model().attributeExists("message"))
-                .andExpect(view().name("redirect:/user/badUser"));
+                .andExpect(view().name("user/alertMessage"));
 
     	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 

@@ -118,4 +118,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         userRepository.save(userRegistered);
 	}
 
+	@Override
+	public TokenEntity findToken(UserEntity user, TypeEmailEnum typeEmail) {
+		return tokenRepository.findByUserAndTypeEmail(user,typeEmail);
+	}
+	
+	@Override
+	public void saveToken(TokenEntity token) {
+		tokenRepository.save(token);
+	}
+
 }

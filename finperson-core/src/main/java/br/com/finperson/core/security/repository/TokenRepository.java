@@ -15,4 +15,5 @@ public interface TokenRepository extends CrudRepository<TokenEntity, Long>{
 
 	@Query("SELECT t FROM TokenEntity t inner join fetch t.user u WHERE u.id = :id and t.token = :token")
 	TokenEntity findByUserIdAndToken(Long id, String token);
+
 }

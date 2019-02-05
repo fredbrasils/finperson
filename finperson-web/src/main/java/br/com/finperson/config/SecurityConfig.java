@@ -40,7 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 		,"/user/forgotPassword"
                 		,"/user/messageResetPassword"
                 		,"/user/registrationConfirm",
-                		"/user/resetPasswordConfirm").permitAll()
+                		"/user/resetPasswordConfirm",
+                		"/user/alertMessage").permitAll()
                 .antMatchers("/user/updatePassword").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
                 .anyRequest().authenticated()
                 //.hasAnyRole(RoleEnum.ROLE_ADIM.name(),RoleEnum.ROLE_USER.name(),RoleEnum.ROLE_GUEST.name())

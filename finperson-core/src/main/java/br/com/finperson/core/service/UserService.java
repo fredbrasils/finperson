@@ -20,9 +20,13 @@ public interface UserService extends BaseService<UserEntity, Long>{
  
     TokenEntity findToken(String token,TypeEmailEnum typeEmail);
     
+    TokenEntity findToken(UserEntity user,TypeEmailEnum typeEmail);
+    
     boolean emailExists(String email);
 
     TokenEntity findByUserIdAndToken(Long id, String token);
 
 	void updatePassword(String password, UserEntity user);
+
+	void saveToken(TokenEntity token);
 }

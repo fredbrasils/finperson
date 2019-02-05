@@ -255,4 +255,27 @@ class UserServiceImplTest {
 
 		assertNotNull(tok);
 	}
+	
+	@DisplayName("Find token by user and type email")
+	@Test
+	void findTokenByUserAndTypeEmail() {
+		
+		when(userService.findToken(any(UserEntity.class),any(TypeEmailEnum.class))).thenReturn(returnToken);
+
+		TokenEntity tok = userService.findToken(returnUser, TypeEmailEnum.CONFIRMATION_USER);
+
+		assertNotNull(tok);
+		
+		verify(tokenRepository).findByUserAndTypeEmail(any(UserEntity.class),any(TypeEmailEnum.class));
+	}
+	
+	@DisplayName("Save token")
+	@Test
+	void saveToken() {
+		
+		userService.saveToken(returnToken);
+		
+		verify(tokenRepository).save(any());
+		
+	}
 }

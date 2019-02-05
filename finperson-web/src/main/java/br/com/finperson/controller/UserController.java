@@ -121,7 +121,7 @@ public class UserController {
 
 	@GetMapping(value = "/user/registrationConfirm")
 	public String confirmRegistration
-	  (WebRequest request, Model model, @RequestParam("token") String token) {
+	  (HttpServletRequest request, Model model, @RequestParam("token") String token) {
 	  
 		Locale locale = request.getLocale();
 	     
@@ -129,17 +129,22 @@ public class UserController {
 	    if (verificationToken == null) {
 	        String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, locale);
 	        model.addAttribute("message", message);
-	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
-	        return "redirect:/user/badUser";
+	        return "user/badUser";
 	    }
 	     
 	    UserEntity user = verificationToken.getUser();
 	    Calendar cal = Calendar.getInstance();
-	    if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-	        String messageValue = messages.getMessage(ConstantsMessages.EXPIRED_TOKEN, null, locale);
-	        model.addAttribute("message", messageValue);
-	        /** return "redirect:/badUser.html?lang=" + locale.getLanguage(); **/
-	        return "redirect:/user/badUser";
+	   if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+	    	try {
+				String appUrl = getAppUrl(request);
+				eventPublisher.publishEvent(new OnSendEmailEvent(user, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER,null));
+			} catch (Exception me) {
+				return "redirect:/login";
+			}
+	    	
+	    	String messageValue = messages.getMessage(ConstantsMessages.NEW_TOKEN_TO_EXPIRED_OTKEN, null, locale);
+	        model.addAttribute("message", messageValue);	        
+	        return "user/alertMessage";
 	    } 
 	     
 	    user.setEnabled(true); 
