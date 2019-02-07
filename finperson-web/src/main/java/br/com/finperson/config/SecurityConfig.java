@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ import br.com.finperson.core.service.security.impl.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
+@EnableJpaAuditing
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer{
 
 	private UserDetailsServiceImpl userDetailsService;
