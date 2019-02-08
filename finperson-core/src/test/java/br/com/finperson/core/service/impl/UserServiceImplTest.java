@@ -29,14 +29,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
+import br.com.finperson.core.repository.TokenRepository;
 import br.com.finperson.core.repository.UserRepository;
-import br.com.finperson.core.security.repository.TokenRepository;
-import br.com.finperson.domain.RoleEntity;
-import br.com.finperson.domain.UserEntity;
-import br.com.finperson.domain.enumm.RoleEnum;
-import br.com.finperson.domain.enumm.TypeEmailEnum;
-import br.com.finperson.security.domain.TokenEntity;
-import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.model.RoleEntity;
+import br.com.finperson.model.TokenEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.model.enumm.RoleEnum;
+import br.com.finperson.model.enumm.TypeEmailEnum;
+import br.com.finperson.model.payload.UserDTO;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {

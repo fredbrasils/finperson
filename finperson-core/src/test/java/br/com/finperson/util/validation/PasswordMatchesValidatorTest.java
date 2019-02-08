@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.model.payload.UserDTO;
 
 class PasswordMatchesValidatorTest {
 

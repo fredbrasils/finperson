@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.service.RoleService;
-import br.com.finperson.domain.RoleEntity;
-import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.model.RoleEntity;
+import br.com.finperson.model.enumm.RoleEnum;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

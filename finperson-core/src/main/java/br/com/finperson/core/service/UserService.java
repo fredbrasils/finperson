@@ -1,10 +1,10 @@
 package br.com.finperson.core.service;
 
 import br.com.finperson.core.exception.EmailExistsException;
-import br.com.finperson.domain.UserEntity;
-import br.com.finperson.domain.enumm.TypeEmailEnum;
-import br.com.finperson.security.domain.TokenEntity;
-import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.model.TokenEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.model.enumm.TypeEmailEnum;
+import br.com.finperson.model.payload.UserDTO;
 
 public interface UserService extends BaseService<UserEntity, Long>{
 

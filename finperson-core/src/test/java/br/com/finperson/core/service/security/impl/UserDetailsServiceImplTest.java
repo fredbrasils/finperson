@@ -20,9 +20,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 
 import br.com.finperson.core.repository.UserRepository;
-import br.com.finperson.domain.RoleEntity;
-import br.com.finperson.domain.UserEntity;
-import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.core.service.impl.UserDetailsServiceImpl;
+import br.com.finperson.model.RoleEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.model.enumm.RoleEnum;
 
 @ContextConfiguration
 @ExtendWith(MockitoExtension.class)

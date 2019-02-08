@@ -21,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.finperson.core.repository.RoleRepository;
-import br.com.finperson.domain.RoleEntity;
-import br.com.finperson.domain.enumm.RoleEnum;
+import br.com.finperson.model.RoleEntity;
+import br.com.finperson.model.enumm.RoleEnum;
 
 @ExtendWith(MockitoExtension.class)
 class RoleServiceImplTest {

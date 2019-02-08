@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
+import br.com.finperson.core.repository.TokenRepository;
 import br.com.finperson.core.repository.UserRepository;
-import br.com.finperson.core.security.repository.TokenRepository;
 import br.com.finperson.core.service.UserService;
-import br.com.finperson.domain.RoleEntity;
-import br.com.finperson.domain.UserEntity;
-import br.com.finperson.domain.enumm.RoleEnum;
-import br.com.finperson.domain.enumm.TypeEmailEnum;
-import br.com.finperson.security.domain.TokenEntity;
-import br.com.finperson.security.domain.UserDTO;
+import br.com.finperson.model.RoleEntity;
+import br.com.finperson.model.TokenEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.model.enumm.RoleEnum;
+import br.com.finperson.model.enumm.TypeEmailEnum;
+import br.com.finperson.model.payload.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -63,7 +63,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
-        user.setEnabled(false);
+        //user.setEnabled(false);
+        user.setEnabled(true);
         user.setNonLocked(true);
         
         Set<RoleEntity> roles = new HashSet<>(); 

@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.finperson.core.repository.CategoryRepository;
-import br.com.finperson.domain.CategoryEntity;
+import br.com.finperson.model.CategoryEntity;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {

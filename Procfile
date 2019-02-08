@@ -1,1 +1,1 @@
-web: java -jar -Dserver.port=$PORT -Dspring.profiles.active=postgresql finperson-web/target/finperson-web-0.0.1-SNAPSHOT.jar
+web: java -jar -Dserver.port=$PORT -Dspring.profiles.active=postgresql finperson-controller/target/finperson-controller-0.0.1-SNAPSHOT.jar
