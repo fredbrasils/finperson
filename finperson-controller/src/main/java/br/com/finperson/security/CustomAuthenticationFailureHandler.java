@@ -15,7 +15,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 
-//@Component
+//@Component 
+//TODO: THIS IS NOT USING FOR WHILE, MAYBE IT WON'T BE USED
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
  
     @Autowired

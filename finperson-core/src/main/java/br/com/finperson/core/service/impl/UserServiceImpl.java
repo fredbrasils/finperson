@@ -18,7 +18,7 @@ import br.com.finperson.model.TokenEntity;
 import br.com.finperson.model.UserEntity;
 import br.com.finperson.model.enumm.RoleEnum;
 import br.com.finperson.model.enumm.TypeEmailEnum;
-import br.com.finperson.model.payload.UserDTO;
+import br.com.finperson.model.payload.AuthSingUp;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -49,7 +49,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 
 	@Transactional
     @Override
-    public UserEntity registerNewUserAccount(UserDTO accountDto) 
+    public UserEntity registerNewUserAccount(AuthSingUp accountDto) 
       throws EmailExistsException {
          
 		log.debug("Register user");
@@ -63,8 +63,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
-        //user.setEnabled(false);
-        user.setEnabled(true);
+        user.setEnabled(false);
+        //user.setEnabled(true);
         user.setNonLocked(true);
         
         Set<RoleEntity> roles = new HashSet<>(); 

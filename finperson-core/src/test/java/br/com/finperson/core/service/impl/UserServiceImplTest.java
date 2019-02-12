@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 import br.com.finperson.core.exception.EmailExistsException;
 import br.com.finperson.core.repository.RoleRepository;
 import br.com.finperson.core.repository.TokenRepository;
@@ -36,7 +35,7 @@ import br.com.finperson.model.TokenEntity;
 import br.com.finperson.model.UserEntity;
 import br.com.finperson.model.enumm.RoleEnum;
 import br.com.finperson.model.enumm.TypeEmailEnum;
-import br.com.finperson.model.payload.UserDTO;
+import br.com.finperson.model.payload.AuthSingUp;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -168,7 +167,7 @@ class UserServiceImplTest {
 		
 		UserEntity newUser = null;
 		try {
-			newUser = userService.registerNewUserAccount(new UserDTO());
+			newUser = userService.registerNewUserAccount(new AuthSingUp());
 		} catch (Exception e) {
 			fail();
 		}
@@ -183,7 +182,7 @@ class UserServiceImplTest {
 	void testNotRegisterUserAccount() {
 		
 		when(userRepository.findByEmail(any())).thenReturn(returnUser);
-		assertThrows(EmailExistsException.class, () -> userService.registerNewUserAccount(new UserDTO()));
+		assertThrows(EmailExistsException.class, () -> userService.registerNewUserAccount(new AuthSingUp()));
 
 	}
 	

@@ -37,10 +37,10 @@ public class SendEmailListener implements ApplicationListener<OnSendEmailEvent> 
 
 	@Override
 	public void onApplicationEvent(OnSendEmailEvent event) {
-		this.confirmRegistration(event);
+		this.createEmail(event);
 	}
 
-	private void confirmRegistration(OnSendEmailEvent event) {
+	private void createEmail(OnSendEmailEvent event) {
 		UserEntity user = event.getUser();
 		String token = UUID.randomUUID().toString();
 		

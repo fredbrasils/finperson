@@ -1,4 +1,4 @@
-package br.com.finperson.core.service.security.impl;
+package br.com.finperson.core.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
