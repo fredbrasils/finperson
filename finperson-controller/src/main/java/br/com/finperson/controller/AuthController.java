@@ -82,7 +82,7 @@ public class AuthController extends BaseController{
     public ResponseEntity<GenericResponse> registerUser(@Valid @RequestBody AuthSingUp signUpRequest, BindingResult result,
 			HttpServletRequest request, Errors errors) {
     	
-    	UserEntity user = new UserEntity();
+    	UserEntity user = null;
     	
     	if (!result.hasErrors()) {
     		try {

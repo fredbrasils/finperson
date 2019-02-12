@@ -296,6 +296,42 @@ class AuthControllerTest extends AbstractRestControllerTest{
 
     }
     
+    @DisplayName(value="Confirmation register denied because the token is expired and throws exception when tried send new token")
+    @Test
+    void throwExceptionWhenExpiredToken() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.set(Calendar.YEAR, 2018);
+    	token.setExpiryDate(calendar.getTime());
+    	
+    	when(userService.findToken(ArgumentMatchers.anyString(), ArgumentMatchers.eq(TypeEmailEnum.CONFIRMATION_USER))).thenReturn(token);
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	Mockito.doCallRealMethod().when(eventPublisher).publishEvent(null);
+    	
+    	mockMvc.perform(get("/api/auth/registrationConfirmed")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.param("token", "token123"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", equalTo(false)))
+                .andExpect(jsonPath("$.message", equalTo("messages")));
+
+    	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
+
+    }
+    
     @DisplayName(value="Send email to confirme reset of the password")
     @Test
     void sendEmailToConfirmResetPassword() throws Exception {
