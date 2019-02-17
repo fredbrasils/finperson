@@ -74,7 +74,7 @@ public class AuthController extends BaseController{
 	        String jwt = tokenProvider.generateToken(authentication);
 	        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     	}catch (Exception e) {
-    		return messageError(request, ConstantsMessages.AUTH_MESSAGE_ERROR_USER_OR_PASSWORD_NOT_EXISTS, null);
+    		return messageError(request, new String[] {ConstantsMessages.AUTH_MESSAGE_ERROR_USER_OR_PASSWORD_NOT_EXISTS}, null);
 		}
     }
 
@@ -88,7 +88,7 @@ public class AuthController extends BaseController{
     		try {
 				user = userService.registerNewUserAccount(signUpRequest);
 			} catch (EmailExistsException e) {
-				return messageError(request, ConstantsMessages.MESSAGE_ERROR_EMAIL_EXISTS, null);
+				return messageError(request, new String[] {ConstantsMessages.MESSAGE_ERROR_EMAIL_EXISTS}, null);
 			}
     	}else {
 			return messageError(request, validateErrors(result), null);
@@ -98,14 +98,14 @@ public class AuthController extends BaseController{
 			String appUrl = getAppUrl(request);
 			eventPublisher.publishEvent(new OnSendEmailEvent(user, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER,null));
 		} catch (Exception me) {
-			return messageError(request, ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL, null);
+			return messageError(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL}, null);
 		}
     	
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/users/{username}")
                 .buildAndExpand(user.getEmail()).toUri();
 
-        return ResponseEntity.created(location).body(messageSuccess(request, ConstantsMessages.AUTHSIGUP_MESSAGE_USER_REGISTERED, null));
+        return ResponseEntity.created(location).body(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_USER_REGISTERED}, null));
     }
 
 	@GetMapping(value = "/registrationConfirmed")
@@ -114,7 +114,7 @@ public class AuthController extends BaseController{
 	  
 	    TokenEntity verificationToken = userService.findToken(token, TypeEmailEnum.CONFIRMATION_USER);
 	    if (verificationToken == null) {
-	    	return messageError(request, ConstantsMessages.INVALID_TOKEN, null);
+	    	return messageError(request, new String[] {ConstantsMessages.INVALID_TOKEN}, null);
 	    }
 	     
 	    UserEntity user = verificationToken.getUser();
@@ -124,16 +124,16 @@ public class AuthController extends BaseController{
 				String appUrl = getAppUrl(request);
 				eventPublisher.publishEvent(new OnSendEmailEvent(user, request.getLocale(), appUrl, TypeEmailEnum.CONFIRMATION_USER,null));
 			} catch (Exception me) {
-				return messageError(request, ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL, null);
+				return messageError(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL}, null);
 			}
 	    	
-	    	return messageError(request, ConstantsMessages.NEW_TOKEN_TO_EXPIRED_OTKEN, null);
+	    	return messageError(request, new String[] {ConstantsMessages.NEW_TOKEN_TO_EXPIRED_TOKEN}, null);
 	    } 
 	     
 	    user.setEnabled(true); 
 	    userService.saveRegisteredUser(user); 
 	    
-        return ResponseEntity.ok(messageSuccess(request, ConstantsMessages.AUTHSIGUP_MESSAGE_USER_CONFIRMED, null));
+        return ResponseEntity.ok(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_USER_CONFIRMED}, null));
 	}
 	
 	/** Process to reset password */
@@ -149,17 +149,17 @@ public class AuthController extends BaseController{
 			UserEntity registered = userService.findByEmail(resetPass.getEmail());
 			
 			if (registered == null) {
-				return messageError(request, ConstantsMessages.MESSAGE_ERROR_EMAIL_NOT_EXISTS, null);
+				return messageError(request, new String[] {ConstantsMessages.MESSAGE_ERROR_EMAIL_NOT_EXISTS}, null);
 			}
 			
 			try {
 				String appUrl = getAppUrl(request);
 				eventPublisher.publishEvent(new OnSendEmailEvent(registered, request.getLocale(), appUrl, TypeEmailEnum.RESET_PASSWORD, new Object[] {registered.getId()}));
 			} catch (Exception me) {
-				return messageError(request, ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL, null);
+				return messageError(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_ERROR_SEND_EMAIL}, null);
 			}
 			
-			return ResponseEntity.ok(messageSuccess(request, ConstantsMessages.AUTHSIGUP_MESSAGE_TOKEN_RESET_PASSWORD, null));
+			return ResponseEntity.ok(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_TOKEN_RESET_PASSWORD}, null));
 		}
 	}
 	
@@ -174,12 +174,12 @@ public class AuthController extends BaseController{
 			TokenEntity tokenUser = userService.findByUserIdAndToken(updatePass.getId(), updatePass.getToken());
 			
 			if (tokenUser == null) {
-				return messageError(request, ConstantsMessages.INVALID_TOKEN, null);
+				return messageError(request, new String[] {ConstantsMessages.INVALID_TOKEN}, null);
 			}
 			
 			userService.updatePassword(updatePass.getPassword(), tokenUser.getUser());
 			
-			return ResponseEntity.ok(messageSuccess(request, ConstantsMessages.AUTHSIGUP_MESSAGE_PASSWORD_UPDATED, null));
+			return ResponseEntity.ok(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_PASSWORD_UPDATED}, null));
 			
 		}
 

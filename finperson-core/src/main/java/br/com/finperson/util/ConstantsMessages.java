@@ -20,7 +20,7 @@ public class ConstantsMessages {
 
 	public static final String INVALID_TOKEN = "auth.message.invalidToken";
 	public static final String EXPIRED_TOKEN = "auth.message.expiredToken";
-	public static final String NEW_TOKEN_TO_EXPIRED_OTKEN = "auth.message.new.token.to.expired.token";
+	public static final String NEW_TOKEN_TO_EXPIRED_TOKEN = "auth.message.new.token.to.expired.token";
 	
 	public static final String USER_REGISTRATION_SUBJECT = "user.registration.subject";
 	public static final String USER_REGISTRATION_MESSAGE = "user.registration.message";

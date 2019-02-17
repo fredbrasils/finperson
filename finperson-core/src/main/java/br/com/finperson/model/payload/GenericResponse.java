@@ -12,5 +12,5 @@ import lombok.Setter;
 public class GenericResponse {
 
 	private Boolean success;
-    private String message;
+    private String[] message;
 }

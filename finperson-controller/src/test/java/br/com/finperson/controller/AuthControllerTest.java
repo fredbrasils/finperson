@@ -290,7 +290,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
         		.param("token", "token123"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success", equalTo(false)))
-                .andExpect(jsonPath("$.message", equalTo("messages")));
+                ;
 
     	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 
@@ -325,8 +325,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
         		.contentType(MediaType.APPLICATION_JSON)
         		.param("token", "token123"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success", equalTo(false)))
-                .andExpect(jsonPath("$.message", equalTo("messages")));
+                .andExpect(jsonPath("$.success", equalTo(false)));
 
     	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
 

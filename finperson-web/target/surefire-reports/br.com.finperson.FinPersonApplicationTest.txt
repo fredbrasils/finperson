@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: br.com.finperson.FinPersonApplicationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.777 s <<< FAILURE! - in br.com.finperson.FinPersonApplicationTest
+contextLoads  Time elapsed: 0 s  <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [br.com.finperson.controller.UserController] from ClassLoader [jdk.internal.loader.ClassLoaders$AppClassLoader@2aae9190]
+Caused by: java.lang.NoClassDefFoundError: br/com/finperson/core/repository/EmailExistsException
+Caused by: java.lang.ClassNotFoundException: br.com.finperson.core.repository.EmailExistsException
+

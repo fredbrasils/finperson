@@ -21,40 +21,47 @@ public abstract class BaseController {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 	
-	protected String validateErrors(BindingResult result) {
+	protected String[] validateErrors(BindingResult result) {
 		
-		String message = null;
+		String[] message = new String[result.getErrorCount()];
+		int count = 0;
 		
 		for (Object object : result.getAllErrors()) {
 			
 			if (object instanceof FieldError) {
 				FieldError fieldError = (FieldError) object;
 
-				message = fieldError.getCodes()[0];
-				break;
+				message[count] = fieldError.getCodes()[0];
 			
 			}else if (object instanceof ObjectError) {
 				ObjectError objectError = (ObjectError) object;
 
-				message = objectError.getCode();
-				break;
+				message[count] = objectError.getCode();
 			}
+			
+			count++;
 		}
 		
 		return message;
 	}
 
-	protected ResponseEntity<GenericResponse> messageError(HttpServletRequest request, String messageCode, Object[] args){
+	protected ResponseEntity<GenericResponse> messageError(HttpServletRequest request, String[] messageCode, Object[] args){
 		return new ResponseEntity<GenericResponse>(message(request, messageCode, args, false), HttpStatus.BAD_REQUEST);
 	}
 	
-	protected GenericResponse messageSuccess(HttpServletRequest request, String messageCode, Object[] args){
+	protected GenericResponse messageSuccess(HttpServletRequest request, String[] messageCode, Object[] args){
 		return message(request, messageCode, args, true);
 	}
 	
-	private GenericResponse message(HttpServletRequest request, String messageCode, Object[] args, boolean success){
-		String message = messages.getMessage(messageCode, args, request.getLocale());
-    	return new GenericResponse(success, message);
-    	
+	private GenericResponse message(HttpServletRequest request, String[] messageCode, Object[] args, boolean success){
+		
+		String[] message = new String[messageCode.length];
+		int count = 0;
+		for(String msg : messageCode) {
+			message[count] = messages.getMessage(msg, args, request.getLocale());
+			count++;
+		}
+		
+		return new GenericResponse(success, message);
 	}
 }
