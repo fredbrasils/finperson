@@ -59,20 +59,29 @@ public class AuthController extends BaseController{
 	}
 
 	@PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthLogin loginRequest, HttpServletRequest request) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthLogin loginRequest, BindingResult result,
+			HttpServletRequest request, Errors errors) {
 
     	try {
-	        Authentication authentication = authenticationManager.authenticate(
-	                new UsernamePasswordAuthenticationToken(
-	                        loginRequest.getEmail(),
-	                        loginRequest.getPassword()
-	                )
-	        );
-	
-	        SecurityContextHolder.getContext().setAuthentication(authentication);
-	
-	        String jwt = tokenProvider.generateToken(authentication);
-	        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    		
+    		if (!result.hasErrors()) {
+
+    			Authentication authentication = authenticationManager.authenticate(
+    					new UsernamePasswordAuthenticationToken(
+    							loginRequest.getEmail(),
+    							loginRequest.getPassword()
+    							)
+    					);
+    			
+    			SecurityContextHolder.getContext().setAuthentication(authentication);
+    			
+    			String jwt = tokenProvider.generateToken(authentication);
+    			return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        		
+        	}else {
+    			return messageError(request, validateErrors(result), null);
+    		} 
+    		
     	}catch (Exception e) {
     		return messageError(request, new String[] {ConstantsMessages.AUTH_MESSAGE_ERROR_USER_OR_PASSWORD_NOT_EXISTS}, null);
 		}

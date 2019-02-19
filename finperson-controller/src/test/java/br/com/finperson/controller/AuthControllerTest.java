@@ -118,6 +118,24 @@ class AuthControllerTest extends AbstractRestControllerTest{
 
     }
     
+    @DisplayName(value="Not Autenticated because email is empty")
+    @Test
+    void notAutenticateUserBecauseEmailEmpty() throws Exception {
+    	
+    	AuthLogin login = new AuthLogin();
+    	login.setEmail("");
+    	login.setPassword("123");
+
+    	mockMvc.perform(post("/api/auth/signin")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(login)))
+               	.andExpect(status().isBadRequest())
+               	.andExpect(jsonPath("$.success", equalTo(false)));
+                ;
+
+    }
+    
     @DisplayName(value="Register a new user")
     @Test
     void registerUserAccount() throws Exception {
