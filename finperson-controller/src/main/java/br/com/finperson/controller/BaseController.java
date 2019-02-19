@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,11 +15,17 @@ import br.com.finperson.model.payload.GenericResponse;
 
 public abstract class BaseController {
 
+	private static final String URL_CLIENT = "url.client";
+	
 	@Autowired
     private MessageSource messages;
 	
+	@Autowired
+	private Environment env;
+	
 	protected String getAppUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+		return env.getProperty(URL_CLIENT);
+        //return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 	
 	protected String[] validateErrors(BindingResult result) {
