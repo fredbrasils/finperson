@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -65,6 +66,9 @@ class AuthControllerTest extends AbstractRestControllerTest{
     
     @Mock
     JwtTokenProvider tokenProvider;
+    
+    @Mock
+	Environment env;
     
     @BeforeEach
     void setUp() {
