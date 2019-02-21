@@ -540,4 +540,87 @@ class AuthControllerTest extends AbstractRestControllerTest{
 
     }
     
+    @DisplayName(value="Authorization update password.") 
+    @Test
+    void confirmUpdatePassword() throws Exception {
+		
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).thenReturn(token);
+
+        mockMvc.perform(get("/api/auth/resetPasswordConfirmed")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.param("token", "123")
+        		.param("id", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(1)))
+                .andExpect(jsonPath("$.user.firstName", equalTo("Fred")))
+                .andExpect(jsonPath("$.token", equalTo("token1234")))
+                ;
+
+    }
+    
+    @DisplayName(value="Authorization update password denied because the token is invalid.")
+    @Test
+    void invalidTokenToUpdatePassword() throws Exception {
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).thenReturn(null);
+
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+
+        mockMvc.perform(get("/api/auth/resetPasswordConfirmed")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.param("token", "token123")
+        		.param("id", "1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", equalTo(false)));
+    }
+    
+    @DisplayName(value="Authorization update password denied because the token is expired.")
+    @Test
+    void expiredTokenToUpdatePassword() throws Exception {
+    	
+    	UserEntity user = UserEntity.builder().id(1l)
+				.firstName("Fred")
+				.lastName("Brasil")
+				.email("fredbrasils@hotmail.com")
+				.build();
+		
+    	TokenEntity token = TokenEntity.builder()
+				.id(1l)
+				.user(user)
+				.token("token1234")
+				.build();
+		
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.set(Calendar.YEAR, 2018);
+    	token.setExpiryDate(calendar.getTime());
+    	
+    	when(userService.findByUserIdAndToken(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).thenReturn(token);
+
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn("messages");
+    	
+    	 mockMvc.perform(get("/api/auth/resetPasswordConfirmed")
+         		.accept(MediaType.APPLICATION_JSON)
+         		.contentType(MediaType.APPLICATION_JSON)
+         		.param("token", "token123")
+         		.param("id", "1"))
+                 .andExpect(status().isBadRequest())
+                 .andExpect(jsonPath("$.success", equalTo(false)));
+
+    }
+    
+    
 }

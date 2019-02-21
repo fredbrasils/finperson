@@ -194,34 +194,22 @@ public class AuthController extends BaseController{
 
 	}
 	
-	/*
-	@GetMapping(value = "/user/resetPasswordConfirm")
-	public String showUpdatePasswordPage(Locale locale, Model model, 
-	  @RequestParam("id") Long id, @RequestParam("token") String token) {
-	    
+	@GetMapping(value = "/resetPasswordConfirmed")
+	public ResponseEntity<?> confirmUpdatePassword
+	  (HttpServletRequest request, @RequestParam("token") String token,  @RequestParam("id") Long id) {
+	  
 		TokenEntity tokenUser = userService.findByUserIdAndToken(id, token);
-	    
-	    if (tokenUser == null) {
-	    	String message = messages.getMessage(ConstantsMessages.INVALID_TOKEN, null, locale);
-	        model.addAttribute("message", message);
-	        return "redirect:/user/badUser";
+		
+		if (tokenUser == null) {
+			return messageError(request, new String[] {ConstantsMessages.INVALID_TOKEN}, null);
 	    }
 	    
 	    Calendar cal = Calendar.getInstance();
 	    if ((tokenUser.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-	    	String message = messages.getMessage(ConstantsMessages.EXPIRED_TOKEN, null, locale);
-	        model.addAttribute("message", message);
-	        return "redirect:/user/badUser";
+	    	return messageError(request, new String[] {ConstantsMessages.EXPIRED_TOKEN}, null);
 	    }
 	    
-	    Authentication auth = 
-	    		new UsernamePasswordAuthenticationToken( tokenUser.getUser(), 
-	    				null, Arrays.asList(new SimpleGrantedAuthority("CHANGE_PASSWORD_PRIVILEGE")));
-	    SecurityContextHolder.getContext().setAuthentication(auth);
-	    	 
-	    model.addAttribute("user", convertToUserDTO(tokenUser));
-	    return "user/updatePassword";
+	    return ResponseEntity.ok(tokenUser);
 	}
-	*/
 	
 }
