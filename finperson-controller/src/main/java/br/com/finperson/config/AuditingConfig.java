@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import br.com.finperson.model.UserEntity;
 
 @Configuration
 @EnableJpaAuditing
@@ -33,8 +34,8 @@ class SpringSecurityAuditAwareImpl implements AuditorAware<String> {
             return Optional.empty();
         }
 
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        UserEntity userPrincipal = (UserEntity) authentication.getPrincipal();
 
-        return Optional.ofNullable(userPrincipal.getUsername());
+        return Optional.ofNullable(userPrincipal.getEmail());
     }
 }
