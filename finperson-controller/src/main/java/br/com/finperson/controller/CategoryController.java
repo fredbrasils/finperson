@@ -1,33 +1,46 @@
 package br.com.finperson.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.finperson.core.service.CategoryService;
+import br.com.finperson.core.service.UserService;
+import br.com.finperson.model.CategoryEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.util.ConstantsMessages;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller
-public class CategoryController {
+@RestController
+@RequestMapping("/api/category")
+public class CategoryController extends BaseController{
 
 	private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, UserService userService) {
+    	super(userService);
         this.categoryService = categoryService;
     }
     
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
+    @GetMapping(value = "/list")
+	public ResponseEntity<?> findCategories(HttpServletRequest request) {
+	  
+    	log.debug("CategoryController:findCategories");
+    	UserEntity user = getCurrentUser();
+	    if (user == null) {
+	    	return messageError(request, new String[] {ConstantsMessages.INVALID_USER}, null);
+	    }
+	     
+	    Set<CategoryEntity> list = categoryService.findAll();
+	    
+        return ResponseEntity.ok(list);
+    
     }
     
-    @GetMapping(value = "/category/list")
-    public String findCategories(Model model){
-    	log.debug("CategoryController::findCategories");
-        model.addAttribute("categories", categoryService.findAll());
-        return "category/categories";
-    }
 }

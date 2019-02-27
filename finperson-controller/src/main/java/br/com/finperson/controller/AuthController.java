@@ -51,7 +51,7 @@ public class AuthController extends BaseController{
 	
     public AuthController(AuthenticationManager authenticationManager, UserService userService,
 			JwtTokenProvider tokenProvider, ApplicationEventPublisher eventPublisher) {
-		super();
+		super(userService);
 		this.authenticationManager = authenticationManager;
 		this.userService = userService;
 		this.tokenProvider = tokenProvider;

@@ -67,10 +67,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                         .permitAll()
                     .antMatchers("/api/auth/**")
                         .permitAll()
-                    /*.antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
-                        .permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
-                        .permitAll()*/
                     .anyRequest()
                         .authenticated();
 
@@ -78,36 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
-	
-	/*
-	@Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .antMatchers("/", "/index"
-                		,"/user/registration"
-                		,"/user/forgotPassword"
-                		,"/user/messageResetPassword"
-                		,"/user/registrationConfirm",
-                		"/user/resetPasswordConfirm",
-                		"/user/alertMessage").permitAll()
-                .antMatchers("/user/updatePassword").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
-                .anyRequest().authenticated()
-                //.hasAnyRole(RoleEnum.ROLE_ADIM.name(),RoleEnum.ROLE_USER.name(),RoleEnum.ROLE_GUEST.name())
-                .and()
-            .formLogin()
-                .loginPage("/login")
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .permitAll()
-                .and()
-            .logout()
-            .logoutSuccessUrl("/index")
-            .deleteCookies("JSESSIONID")
-            .permitAll();
-    }
-	*/
-	 
+		 
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
