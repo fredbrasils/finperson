@@ -31,7 +31,6 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -79,15 +78,12 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	when(userService.findByEmail(any())).thenReturn(user);
-    	
     	when(categoryService.findAll()).thenReturn(categories);
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    	UserDetails userDetails = Mockito.mock(UserDetails.class);
     	Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-    	Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
+    	Mockito.when(authentication.getPrincipal()).thenReturn(user);
     	SecurityContextHolder.setContext(securityContext);
     	
         mockMvc.perform(get("/api/category/list")

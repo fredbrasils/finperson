@@ -45,8 +45,7 @@ public abstract class BaseController {
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
-			UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-		    return userService.findByEmail(userPrincipal.getUsername());
+			return (UserEntity) authentication.getPrincipal();
 		}
 		
 		return null;
