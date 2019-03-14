@@ -152,9 +152,46 @@ class CategoryServiceImplTest {
 
 		when(categoryRepository.findAll(any(Sort.class))).thenReturn(returnCategoriesSet);
 
-		List<CategoryEntity> categories = categoryService.findAll(new Sort(Sort.Direction.ASC, "name"));
+		List<CategoryEntity> categories = categoryService.findAllByOrderByName();
 
 		assertNotNull(categories);
 		assertEquals(2, categories.size());
 	}
+	
+	@Test
+	void update() {
+		
+		CategoryEntity categoryToSave = CategoryEntity.builder().id(1L).name("transport").build();
+
+		when(categoryRepository.save(any())).thenReturn(categoryToSave);
+		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
+		
+		CategoryEntity savedCategory = null;
+		try {
+			savedCategory = categoryService.update(categoryToSave);
+		} catch (EntityExistsException e) {
+		}
+
+		assertNotNull(savedCategory);
+
+		verify(categoryRepository).save(any());
+	}
+	
+	@Test
+	void dontUpdate() {
+		
+		CategoryEntity categoryToSave = CategoryEntity.builder().id(2L).name("transport").build();
+
+		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
+		
+		try {
+			categoryService.update(categoryToSave);
+		} catch (EntityExistsException e) {
+			assertTrue(true);
+		}
+
+
+		verify(categoryRepository, times(0)).save(any());
+	}
+	
 }

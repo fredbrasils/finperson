@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
@@ -45,19 +44,19 @@ public class CategoryController extends BaseController{
 	    	return messageError(request, new String[] {ConstantsMessages.INVALID_USER}, null);
 	    }
 	     
-	    List<CategoryEntity> list = categoryService.findAll(orderByName());
+	    List<CategoryEntity> list = categoryService.findAllByOrderByName();
 	    
         return ResponseEntity.ok(list);
     
     }
     
     @PostMapping("/insert")
-    public ResponseEntity<GenericResponse> registerUser(@Valid @RequestBody CategoryEntity category, BindingResult result,
+    public ResponseEntity<GenericResponse> createCategory(@Valid @RequestBody CategoryEntity category, BindingResult result,
 			HttpServletRequest request, Errors errors) {
-    	
     	CategoryEntity categorySaved = null;
     	
     	if (!result.hasErrors()) {
+    	
     		try {
     			categorySaved = categoryService.create(category);
 			} catch (EntityExistsException e) {
@@ -70,7 +69,24 @@ public class CategoryController extends BaseController{
     	return ResponseEntity.ok(messageSuccess(categorySaved, request, new String[] {ConstantsMessages.SUCCESS}, null));
     }
     
-    private Sort orderByName() {
-    	return Sort.by(Sort.Order.asc("name").ignoreCase());
-    } 
+    @PostMapping("/update")
+    public ResponseEntity<GenericResponse> updateCategory(@Valid @RequestBody CategoryEntity category, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+    	
+    	CategoryEntity categorySaved = null;
+    	
+    	if (!result.hasErrors()) {
+    	
+    		try {
+    			categorySaved = categoryService.update(category);
+			} catch (EntityExistsException e) {
+				return messageError(request, new String[] {ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS}, null);
+			}
+    	}else {
+			return messageError(request, validateErrors(result), null);
+		} 
+
+    	return ResponseEntity.ok(messageSuccess(categorySaved, request, new String[] {ConstantsMessages.SUCCESS}, null));
+    }
+    
 }

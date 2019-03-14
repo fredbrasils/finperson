@@ -44,9 +44,29 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		return categoryRepository.save(entity);
 	}
 
-	@Override
-	public List<CategoryEntity> findAll(Sort sort) {
-		return Lists.newArrayList(categoryRepository.findAll(sort));
+	@Transactional
+    @Override
+	public CategoryEntity update(CategoryEntity entity) throws EntityExistsException {
+		
+		log.debug("Update category");
+		
+		CategoryEntity categorySearched = categoryRepository.findByNameIgnoreCase(entity.getName());
+		
+		if(categorySearched != null && !entity.getId().equals(categorySearched.getId())) {
+			throw new EntityExistsException("");
+		}
+		
+		entity.setName(StringUtils.capitalize(entity.getName())); 
+		return categoryRepository.save(entity);
 	}
 
+	
+	@Override
+	public List<CategoryEntity> findAllByOrderByName() {
+		return Lists.newArrayList(categoryRepository.findAll(orderBy("name")));
+	}
+
+	private Sort orderBy(String field) {
+		return Sort.by(Sort.Order.asc(field).ignoreCase());
+	}
 }

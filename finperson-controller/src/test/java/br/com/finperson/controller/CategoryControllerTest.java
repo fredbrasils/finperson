@@ -82,7 +82,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	when(categoryService.findAll(any())).thenReturn(Lists.newArrayList(categories));
+    	when(categoryService.findAllByOrderByName()).thenReturn(Lists.newArrayList(categories));
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -202,5 +202,67 @@ class CategoryControllerTest extends AbstractRestControllerTest{
                 ;
         
         verify(categoryService, times(0)).create(ArgumentMatchers.any());
+    }
+    
+    @DisplayName(value="Update a category")
+    @Test
+    void updateCategory() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("home").icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	when(categoryService.update(ArgumentMatchers.any(CategoryEntity.class))).thenReturn(category);
+
+        mockMvc.perform(post("/api/category/update")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.object.name", equalTo(category.getName())))
+                .andExpect(jsonPath("$.object.icon", equalTo(category.getIcon())))
+                .andExpect(jsonPath("$.object.color", equalTo(category.getColor())))
+                ;
+
+        verify(categoryService).update(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Doesnt update Category because category's name already exists")
+    @Test
+    void updateCategoryExists() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("home").icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	when(categoryService.update(ArgumentMatchers.any(CategoryEntity.class))).thenThrow(EntityExistsException.class);
+
+        mockMvc.perform(post("/api/category/update")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                ;
+        
+        verify(categoryService).update(ArgumentMatchers.any());
+    }
+    
+    @DisplayName(value="Doesnt update Category because miss field")
+    @Test
+    void updateCategoryMissField() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+        mockMvc.perform(post("/api/category/update")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                ;
+        
+        verify(categoryService, times(0)).update(ArgumentMatchers.any());
     }
 }
