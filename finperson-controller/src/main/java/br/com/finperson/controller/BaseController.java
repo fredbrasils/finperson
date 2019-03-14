@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -76,14 +75,22 @@ public abstract class BaseController {
 	}
 
 	protected ResponseEntity<GenericResponse> messageError(HttpServletRequest request, String[] messageCode, Object[] args){
-		return new ResponseEntity<GenericResponse>(message(request, messageCode, args, false), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<GenericResponse>(message(null,request, messageCode, args, false), HttpStatus.BAD_REQUEST);
+	}
+	
+	protected ResponseEntity<GenericResponse> messageError(Object object, HttpServletRequest request, String[] messageCode, Object[] args){
+		return new ResponseEntity<GenericResponse>(message(object,request, messageCode, args, false), HttpStatus.BAD_REQUEST);
 	}
 	
 	protected GenericResponse messageSuccess(HttpServletRequest request, String[] messageCode, Object[] args){
-		return message(request, messageCode, args, true);
+		return message(null,request, messageCode, args, true);
 	}
 	
-	private GenericResponse message(HttpServletRequest request, String[] messageCode, Object[] args, boolean success){
+	protected GenericResponse messageSuccess(Object object, HttpServletRequest request, String[] messageCode, Object[] args){
+		return message(object,request, messageCode, args, true);
+	}
+	
+	private GenericResponse message(Object object, HttpServletRequest request, String[] messageCode, Object[] args, boolean success){
 		
 		String[] message = new String[messageCode.length];
 		int count = 0;
@@ -92,6 +99,6 @@ public abstract class BaseController {
 			count++;
 		}
 		
-		return new GenericResponse(success, message);
+		return new GenericResponse(object, success, message);
 	}
 }

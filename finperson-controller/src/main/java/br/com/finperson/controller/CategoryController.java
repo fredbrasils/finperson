@@ -1,18 +1,26 @@
 package br.com.finperson.controller;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.service.CategoryService;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.model.CategoryEntity;
 import br.com.finperson.model.UserEntity;
+import br.com.finperson.model.payload.GenericResponse;
 import br.com.finperson.util.ConstantsMessages;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,10 +45,32 @@ public class CategoryController extends BaseController{
 	    	return messageError(request, new String[] {ConstantsMessages.INVALID_USER}, null);
 	    }
 	     
-	    Set<CategoryEntity> list = categoryService.findAll();
+	    List<CategoryEntity> list = categoryService.findAll(orderByName());
 	    
         return ResponseEntity.ok(list);
     
     }
     
+    @PostMapping("/insert")
+    public ResponseEntity<GenericResponse> registerUser(@Valid @RequestBody CategoryEntity category, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+    	
+    	CategoryEntity categorySaved = null;
+    	
+    	if (!result.hasErrors()) {
+    		try {
+    			categorySaved = categoryService.create(category);
+			} catch (EntityExistsException e) {
+				return messageError(request, new String[] {ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS}, null);
+			}
+    	}else {
+			return messageError(request, validateErrors(result), null);
+		} 
+
+    	return ResponseEntity.ok(messageSuccess(categorySaved, request, new String[] {ConstantsMessages.SUCCESS}, null));
+    }
+    
+    private Sort orderByName() {
+    	return Sort.by(Sort.Order.asc("name").ignoreCase());
+    } 
 }

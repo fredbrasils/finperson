@@ -5,10 +5,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.service.CategoryService;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.model.CategoryEntity;
@@ -138,4 +138,65 @@ class CategoryControllerTest extends AbstractRestControllerTest{
         verify(userService, times(0)).findByEmail(any());
     }
     
+    @DisplayName(value="Create a new category")
+    @Test
+    void registerCategory() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("home").icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	when(categoryService.create(ArgumentMatchers.any(CategoryEntity.class))).thenReturn(category);
+
+        mockMvc.perform(post("/api/category/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.object.name", equalTo(category.getName())))
+                .andExpect(jsonPath("$.object.icon", equalTo(category.getIcon())))
+                .andExpect(jsonPath("$.object.color", equalTo(category.getColor())))
+                ;
+
+        verify(categoryService).create(ArgumentMatchers.any());
+
+    }
+    
+    @DisplayName(value="Category already exists")
+    @Test
+    void categoryExists() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("home").icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	when(categoryService.create(ArgumentMatchers.any(CategoryEntity.class))).thenThrow(EntityExistsException.class);
+
+        mockMvc.perform(post("/api/category/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                ;
+        
+        verify(categoryService).create(ArgumentMatchers.any());
+    }
+    
+    @DisplayName(value="Category miss field")
+    @Test
+    void categoryMissField() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+        mockMvc.perform(post("/api/category/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                ;
+        
+        verify(categoryService, times(0)).create(ArgumentMatchers.any());
+    }
 }

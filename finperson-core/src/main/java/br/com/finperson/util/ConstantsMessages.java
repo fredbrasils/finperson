@@ -28,6 +28,10 @@ public class ConstantsMessages {
 	public static final String USER_RESET_PASSWORD_SUBJECT = "user.resetpassword.subject";
 	public static final String USER_RESET_PASSWORD_MESSAGE = "user.resetpassword.message";
 	
+	public static final String CATEGORY_MESSAGE_ERROR_EXISTS = "category.message.error.exists";
+	
+	public static final String SUCCESS = "operation.success";
+	
 	private ConstantsMessages() {
 	}
 }

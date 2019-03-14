@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GenericResponse {
 
+	private Object object;
 	private Boolean success;
     private String[] message;
 }
