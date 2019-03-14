@@ -5,7 +5,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,6 +34,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.google.common.collect.Lists;
 
 import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.service.CategoryService;
@@ -78,7 +82,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	when(categoryService.findAll()).thenReturn(categories);
+    	when(categoryService.findAll(any())).thenReturn(Lists.newArrayList(categories));
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);
