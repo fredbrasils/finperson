@@ -162,7 +162,6 @@ class CategoryServiceImplTest {
 	void update() {
 		
 		CategoryEntity categoryToSave = CategoryEntity.builder().id(1L).name("transport").build();
-
 		when(categoryRepository.save(any())).thenReturn(categoryToSave);
 		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
 		
@@ -181,7 +180,6 @@ class CategoryServiceImplTest {
 	void dontUpdate() {
 		
 		CategoryEntity categoryToSave = CategoryEntity.builder().id(2L).name("transport").build();
-
 		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
 		
 		try {
