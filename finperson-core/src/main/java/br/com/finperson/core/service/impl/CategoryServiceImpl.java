@@ -52,7 +52,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		
 		CategoryEntity categorySearched = categoryRepository.findByNameIgnoreCase(entity.getName());
 		
-		if(categorySearched != null && !entity.getId().equals(categorySearched.getId())) {
+		if(categorySearched != null && !categorySearched.getId().equals(entity.getId())) {
 			throw new EntityExistsException("");
 		}
 		

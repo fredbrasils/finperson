@@ -43,7 +43,8 @@ class CategoryServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		returnCategory = CategoryEntity.builder().id(1l).name(CATEGORY_NAME).color("10-10-10-1").icon("fas fa-plus").build();
+		returnCategory = CategoryEntity.builder().name(CATEGORY_NAME).color("10-10-10-1").icon("fas fa-plus").build();
+		returnCategory.setId(1l);
 	}
 
 	@Test
@@ -161,7 +162,8 @@ class CategoryServiceImplTest {
 	@Test
 	void update() {
 		
-		CategoryEntity categoryToSave = CategoryEntity.builder().id(1L).name("transport").build();
+		CategoryEntity categoryToSave = CategoryEntity.builder().name("transport").build();
+		categoryToSave.setId(1l);
 		when(categoryRepository.save(any())).thenReturn(categoryToSave);
 		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
 		
@@ -179,7 +181,8 @@ class CategoryServiceImplTest {
 	@Test
 	void dontUpdate() {
 		
-		CategoryEntity categoryToSave = CategoryEntity.builder().id(2L).name("transport").build();
+		CategoryEntity categoryToSave = CategoryEntity.builder().name("transport").build();
+		categoryToSave.setId(2l);
 		when(categoryRepository.findByNameIgnoreCase(any())).thenReturn(returnCategory);
 		
 		try {
