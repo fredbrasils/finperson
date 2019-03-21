@@ -285,4 +285,22 @@ class CategoryControllerTest extends AbstractRestControllerTest{
         verify(categoryService).delete(ArgumentMatchers.any());
 
     }
+    
+    @DisplayName(value="Dont remove a category")
+    @Test
+    void dontRemoveCategory() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+        mockMvc.perform(post("/api/category/delete")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest());
+
+        verify(categoryService, times(0)).delete(ArgumentMatchers.any());
+
+    }
 }
