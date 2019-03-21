@@ -89,4 +89,16 @@ public class CategoryController extends BaseController{
     	return ResponseEntity.ok(messageSuccess(categorySaved, request, new String[] {ConstantsMessages.SUCCESS}, null));
     }
     
+    @PostMapping("/delete")
+    public ResponseEntity<GenericResponse> deleteCategory(@Valid @RequestBody CategoryEntity category, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+    	
+    	if (!result.hasErrors()) {
+    		categoryService.delete(category);
+    	}else {
+			return messageError(request, validateErrors(result), null);
+		} 
+
+    	return ResponseEntity.ok(messageSuccess(null, request, new String[] {ConstantsMessages.SUCCESS}, null));
+    }
 }

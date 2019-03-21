@@ -230,7 +230,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     
     @DisplayName(value="Doesnt update Category because category's name already exists")
     @Test
-    void updateCategoryExists() throws Exception {
+    void DontUpdateCategoryExists() throws Exception {
     	
     	CategoryEntity category = CategoryEntity.builder()
     			.name("home").icon("fas fa-plus").color("10-10-10-1")
@@ -250,7 +250,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     
     @DisplayName(value="Doesnt update Category because miss field")
     @Test
-    void updateCategoryMissField() throws Exception {
+    void dontUpdateCategoryMissField() throws Exception {
     	
     	CategoryEntity category = CategoryEntity.builder()
     			.icon("fas fa-plus").color("10-10-10-1")
@@ -264,5 +264,25 @@ class CategoryControllerTest extends AbstractRestControllerTest{
                 ;
         
         verify(categoryService, times(0)).update(ArgumentMatchers.any());
+    }
+    
+    @DisplayName(value="Remove a category")
+    @Test
+    void removeCategory() throws Exception {
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("home").icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	category.setId(1l);
+    	
+        mockMvc.perform(post("/api/category/delete")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isOk());
+
+        verify(categoryService).delete(ArgumentMatchers.any());
+
     }
 }

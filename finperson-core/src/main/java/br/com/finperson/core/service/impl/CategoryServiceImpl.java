@@ -59,13 +59,20 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		entity.setName(StringUtils.capitalize(entity.getName())); 
 		return categoryRepository.save(entity);
 	}
-
 	
 	@Override
 	public List<CategoryEntity> findAllByOrderByName() {
 		return Lists.newArrayList(categoryRepository.findAll(orderBy("name")));
 	}
 
+	@Override
+	public void delete(CategoryEntity entity) {
+
+		//TODO: verify if category have relation avec revenue
+		super.delete(entity);
+		
+	}
+	
 	private Sort orderBy(String field) {
 		return Sort.by(Sort.Order.asc(field).ignoreCase());
 	}
