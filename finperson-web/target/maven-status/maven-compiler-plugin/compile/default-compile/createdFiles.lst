@@ -1,5 +1,0 @@
-br\com\finperson\FinPersonApplication.class
-br\com\finperson\controller\IndexController.class
-br\com\finperson\controller\CategoryController.class
-br\com\finperson\config\SecurityConfig.class
-br\com\finperson\bootstrap\DataLoader.class
