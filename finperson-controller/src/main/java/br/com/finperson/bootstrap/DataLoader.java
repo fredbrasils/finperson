@@ -4,22 +4,18 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import br.com.finperson.core.service.CategoryService;
-import br.com.finperson.core.service.RoleService;
 import br.com.finperson.model.CategoryEntity;
-import br.com.finperson.model.RoleEntity;
-import br.com.finperson.model.enumm.RoleEnum;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+//@Profile("!postgresql")
 public class DataLoader implements CommandLineRunner {
 
 	private final CategoryService categoryService;
-	private final RoleService roleService;
 
-	public DataLoader(CategoryService categoryService, RoleService roleService) {
+	public DataLoader(CategoryService categoryService) {
 		this.categoryService = categoryService;
-		this.roleService = roleService;
 	}
 
 	public void run(String... args) throws Exception {
@@ -50,14 +46,6 @@ public class DataLoader implements CommandLineRunner {
 		categoryService.save(sport);
 
 		log.debug("Loaded Categories....");
-		
-		RoleEntity admin = RoleEntity.builder().role(RoleEnum.ROLE_ADIM).build();
-		RoleEntity user = RoleEntity.builder().role(RoleEnum.ROLE_USER).build();
-		RoleEntity guest = RoleEntity.builder().role(RoleEnum.ROLE_GUEST).build();
-
-		roleService.save(admin);
-		roleService.save(user);
-		roleService.save(guest);
 		
 	}
 

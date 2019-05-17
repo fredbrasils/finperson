@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table
+@Table(name = "role")
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

@@ -65,7 +65,7 @@ class UserServiceImplTest {
 	void setUp() {
 		
 		returnRolesSet = new HashSet<RoleEntity>();
-		returnRolesSet.add(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADIM).build());
+		returnRolesSet.add(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADMIN).build());
 		returnRolesSet.add(RoleEntity.builder().id(2l).role(RoleEnum.ROLE_USER).build());
 		returnRolesSet.add(RoleEntity.builder().id(2l).role(RoleEnum.ROLE_GUEST).build());
 		
@@ -161,7 +161,7 @@ class UserServiceImplTest {
 	void testRegisterNewUserAccount() {
 		
 		when(userRepository.findByEmail(any())).thenReturn(null);
-		when(roleRepository.findByRole(any())).thenReturn(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADIM).build());
+		when(roleRepository.findByRole(any())).thenReturn(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADMIN).build());
 		when(userRepository.save(any())).thenReturn(returnUser);
 		when(passwordEncoder.encode(any())).thenReturn("1234");
 		

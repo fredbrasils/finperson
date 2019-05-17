@@ -10,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import br.com.finperson.model.enumm.TypeEmailEnum;
 import lombok.Builder;
@@ -23,6 +24,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "token")
 public class TokenEntity extends BaseEntity{
 	
 	private static final long serialVersionUID = 1L;

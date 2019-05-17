@@ -2,5 +2,5 @@ package br.com.finperson.model.enumm;
 
 public enum RoleEnum {
 
-	ROLE_ADIM, ROLE_USER, ROLE_GUEST
+	ROLE_ADMIN, ROLE_USER, ROLE_GUEST
 }

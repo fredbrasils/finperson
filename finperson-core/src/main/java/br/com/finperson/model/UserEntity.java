@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table
+@Table(name = "fpuser")
 public class UserEntity extends BaseEntity{
 
 	private static final long serialVersionUID = 1L;
@@ -64,7 +64,7 @@ public class UserEntity extends BaseEntity{
     private Integer validationCode;
 	
 	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"),
+	@JoinTable(name = "fpuser_role", joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<RoleEntity> roles;
 }

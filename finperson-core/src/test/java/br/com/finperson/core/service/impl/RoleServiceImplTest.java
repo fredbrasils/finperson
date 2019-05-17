@@ -41,12 +41,12 @@ class RoleServiceImplTest {
 	void setUp() {
 		
 		returnRolesSet = new HashSet<RoleEntity>();
-		returnRolesSet.add(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADIM).build());
+		returnRolesSet.add(RoleEntity.builder().id(1l).role(RoleEnum.ROLE_ADMIN).build());
 		returnRolesSet.add(RoleEntity.builder().id(2l).role(RoleEnum.ROLE_USER).build());
 		returnRolesSet.add(RoleEntity.builder().id(2l).role(RoleEnum.ROLE_GUEST).build());
 		
 		returnRole = RoleEntity.builder().id(1l)
-				.role(RoleEnum.ROLE_ADIM)
+				.role(RoleEnum.ROLE_ADMIN)
 				.build();
 	}
 
@@ -116,7 +116,7 @@ class RoleServiceImplTest {
 		
 		when(roleRepository.findByRole(any())).thenReturn(returnRole);
 
-		RoleEntity findedRole = roleService.findByRole(RoleEnum.ROLE_ADIM);
+		RoleEntity findedRole = roleService.findByRole(RoleEnum.ROLE_ADMIN);
 
 		assertNotNull(findedRole);
 
