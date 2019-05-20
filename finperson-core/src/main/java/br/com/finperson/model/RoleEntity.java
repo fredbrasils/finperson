@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import br.com.finperson.model.enumm.RoleEnum;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "role")
+@Table(name = "role", uniqueConstraints=@UniqueConstraint(columnNames="role"))
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

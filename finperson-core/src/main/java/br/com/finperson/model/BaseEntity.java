@@ -4,7 +4,7 @@
 package br.com.finperson.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -56,8 +56,8 @@ public class BaseEntity implements Serializable {
 	@Enumerated
     private OperationEnum operation;
       
-    @Column(name = "timestamp")
-    private long timestamp;
+    @Column
+    private LocalDateTime createdTime;
     
 	@Column
     @CreatedBy
@@ -84,6 +84,6 @@ public class BaseEntity implements Serializable {
       
     private void audit(OperationEnum operation) {
         setOperation(operation);
-        setTimestamp((new Date()).getTime());
+        setCreatedTime(LocalDateTime.now());
     }
 }
