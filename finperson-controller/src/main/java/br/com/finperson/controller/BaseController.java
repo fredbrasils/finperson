@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import br.com.finperson.core.service.UserService;
 import br.com.finperson.model.UserEntity;
 import br.com.finperson.model.payload.GenericResponse;
 
@@ -28,11 +27,8 @@ public abstract class BaseController {
 	@Autowired
 	private Environment env;
 	
-	private UserService userService;
-	
-	public BaseController(UserService userService) {
+	public BaseController() {
 		super();
-		this.userService = userService;
 	}
 
 	protected String getAppUrl(HttpServletRequest request) {

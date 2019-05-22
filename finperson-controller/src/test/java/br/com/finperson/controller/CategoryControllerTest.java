@@ -13,9 +13,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,8 +35,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import com.google.common.collect.Lists;
 
 import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.service.CategoryService;
@@ -57,13 +56,13 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     @Mock
     MessageSource messages;
     
-    Set<CategoryEntity> categories;
+    List<CategoryEntity> categories;
 
     MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        categories = new HashSet<CategoryEntity>();
+        categories = new ArrayList<CategoryEntity>();
         categories.add(CategoryEntity.builder().id(1l).build());
         categories.add(CategoryEntity.builder().id(2l).build());
 
@@ -82,7 +81,9 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	when(categoryService.findAllByOrderByName()).thenReturn(Lists.newArrayList(categories));
+    	Optional<List<CategoryEntity>> categoryList = Optional.of(categories);
+    	
+    	when(categoryService.findAllByUser(ArgumentMatchers.any(UserEntity.class))).thenReturn(categoryList);
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);

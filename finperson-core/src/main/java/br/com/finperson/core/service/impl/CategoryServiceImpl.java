@@ -1,19 +1,19 @@
 package br.com.finperson.core.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import com.google.common.collect.Lists;
 
 import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.repository.CategoryRepository;
 import br.com.finperson.core.service.CategoryService;
 import br.com.finperson.model.CategoryEntity;
+import br.com.finperson.model.UserEntity;
+import br.com.finperson.util.ConstantsMessages;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,7 +24,6 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	
 	public CategoryServiceImpl(CategoryRepository categoryRepository) {
 		super(categoryRepository);
-		log.debug("Create CategoryServiceImpl");
 		this.categoryRepository = categoryRepository;
 	}	
 
@@ -34,10 +33,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		
 		log.debug("Create category: ",entity.getName());
 		
-		CategoryEntity categorySearched = categoryRepository.findByNameIgnoreCase(entity.getName());
+		Optional<CategoryEntity> categorySearched = categoryRepository.findOptionalByUserAndNameIgnoreCase(entity.getUser(),entity.getName());
 		
-		if(categorySearched != null) {
-			throw new EntityExistsException("");
+		if(categorySearched.isPresent()) {
+			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
 		}
 		
 		entity.setName(StringUtils.capitalize(entity.getName())); 
@@ -50,10 +49,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		
 		log.debug("Update category");
 		
-		CategoryEntity categorySearched = categoryRepository.findByNameIgnoreCase(entity.getName());
+		Optional<CategoryEntity> categorySearched = categoryRepository.findOptionalByUserAndNameIgnoreCase(entity.getUser(),entity.getName());
 		
-		if(categorySearched != null && !categorySearched.getId().equals(entity.getId())) {
-			throw new EntityExistsException("");
+		if(categorySearched.isPresent() && !categorySearched.get().getId().equals(entity.getId())) {
+			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
 		}
 		
 		entity.setName(StringUtils.capitalize(entity.getName())); 
@@ -61,8 +60,8 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	}
 	
 	@Override
-	public List<CategoryEntity> findAllByOrderByName() {
-		return Lists.newArrayList(categoryRepository.findAll(orderBy("name")));
+	public Optional<List<CategoryEntity>> findAllByUser(UserEntity user) {
+		return categoryRepository.findByUserOrderByNameAsc(user);
 	}
 
 	@Override
@@ -72,8 +71,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		super.delete(entity);
 		
 	}
-	
-	private Sort orderBy(String field) {
-		return Sort.by(Sort.Order.asc(field).ignoreCase());
+
+	@Override
+	public Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user) {
+		return categoryRepository.findByIdAndUser(id,user);
 	}
+	
 }
