@@ -259,7 +259,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(status().isOk())
                 ;
 
-        verify(userService).saveRegisteredUser(ArgumentMatchers.any());
+        verify(userService).registeredUserAndRemoveToken(ArgumentMatchers.any());
 
     }
     
@@ -278,7 +278,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success", equalTo(false)));
 
-        verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
+        verify(userService, times(0)).registeredUserAndRemoveToken(ArgumentMatchers.any());
 
     }
     
@@ -314,7 +314,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(jsonPath("$.success", equalTo(false)))
                 ;
 
-    	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
+    	verify(userService, times(0)).registeredUserAndRemoveToken(ArgumentMatchers.any());
 
     }
     
@@ -349,7 +349,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success", equalTo(false)));
 
-    	verify(userService, times(0)).saveRegisteredUser(ArgumentMatchers.any());
+    	verify(userService, times(0)).registeredUserAndRemoveToken(ArgumentMatchers.any());
 
     }
     
@@ -483,7 +483,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(jsonPath("$.success", equalTo(true)));
     	
         verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
-        verify(userService).updatePassword(anyString(), any(UserEntity.class));
+        verify(userService).updatePassword(anyString(), any(TokenEntity.class));
     }
     
     @DisplayName(value="Don't update password's because token is invalid")
@@ -510,7 +510,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(jsonPath("$.success", equalTo(false)));
     	
         verify(userService).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
-        verify(userService, times(0)).updatePassword(anyString(), any(UserEntity.class));
+        verify(userService, times(0)).updatePassword(anyString(), any(TokenEntity.class));
 
     }
     
@@ -536,7 +536,7 @@ class AuthControllerTest extends AbstractRestControllerTest{
                 .andExpect(jsonPath("$.success", equalTo(false)));
     	
         verify(userService, times(0)).findByUserIdAndToken(ArgumentMatchers.anyLong(), anyString());
-        verify(userService, times(0)).updatePassword(anyString(), any(UserEntity.class));
+        verify(userService, times(0)).updatePassword(anyString(), any(TokenEntity.class));
 
     }
     

@@ -14,7 +14,7 @@ public interface UserService extends BaseService<UserEntity, Long>{
 	
 	UserEntity findUserByToken(String token,TypeEmailEnum typeEmail);
 	 
-    void saveRegisteredUser(UserEntity user);
+    void registeredUserAndRemoveToken(TokenEntity token);
  
     void createToken(UserEntity user, String token,TypeEmailEnum typeEmail);
  
@@ -22,11 +22,9 @@ public interface UserService extends BaseService<UserEntity, Long>{
     
     TokenEntity findToken(UserEntity user,TypeEmailEnum typeEmail);
     
-    boolean emailExists(String email);
-
     TokenEntity findByUserIdAndToken(Long id, String token);
 
-	void updatePassword(String password, UserEntity user);
+	void updatePassword(String password, TokenEntity token);
 
 	void saveToken(TokenEntity token);
 }

@@ -22,6 +22,7 @@ public class ConstantsMessages {
 	public static final String EXPIRED_TOKEN = "auth.message.expiredToken";
 	public static final String NEW_TOKEN_TO_EXPIRED_TOKEN = "auth.message.new.token.to.expired.token";
 	public static final String INVALID_USER = "auth.message.invalidUser";
+	public static final String INVALID_USER_ALREADY_EXISTS = "auth.message.invalid.user.exists";
 	
 	public static final String USER_REGISTRATION_SUBJECT = "user.registration.subject";
 	public static final String USER_REGISTRATION_MESSAGE = "user.registration.message";

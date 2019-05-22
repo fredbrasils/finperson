@@ -43,7 +43,7 @@ public class CategoryController extends BaseController{
 	    	return messageError(request, new String[] {ConstantsMessages.INVALID_USER}, null);
 	    }
 	     
-	    List<CategoryEntity> list = categoryService.findAllByUser(user).get();
+	    List<CategoryEntity> list = categoryService.findAllByUser(user).orElse(null);
 	    
         return ResponseEntity.ok(list);
     

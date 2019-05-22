@@ -19,6 +19,7 @@ import br.com.finperson.model.UserEntity;
 import br.com.finperson.model.enumm.RoleEnum;
 import br.com.finperson.model.enumm.TypeEmailEnum;
 import br.com.finperson.model.payload.AuthSingUp;
+import br.com.finperson.util.ConstantsMessages;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -55,16 +56,15 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 		log.debug("Register user");
 		
         if (emailExists(accountDto.getEmail())) {   
-            throw new EmailExistsException(
-              "There is an account with that email address:"  + accountDto.getEmail());
+            throw new EmailExistsException(ConstantsMessages.INVALID_USER_ALREADY_EXISTS, accountDto.getEmail());
         }
+        
         UserEntity user = new UserEntity();    
         user.setFirstName(accountDto.getFirstName());
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
         user.setEnabled(false);
-        //user.setEnabled(true);
         user.setNonLocked(true);
         
         Set<RoleEntity> roles = new HashSet<>(); 
@@ -74,9 +74,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
         return userRepository.save(user);       
     }
 
-	public boolean emailExists(String email) {
+	private Boolean emailExists(String email) {
 		log.debug("Verify if email exists");
-		
 		return (userRepository.findByEmail(email) != null);
 	}
 
@@ -86,8 +85,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 	}
 
 	@Override
-	public void saveRegisteredUser(UserEntity user) {
+	@Transactional
+	public void registeredUserAndRemoveToken(TokenEntity token) {
+		UserEntity user = token.getUser();
+		user.setEnabled(true);		
 		userRepository.save(user);
+		tokenRepository.delete(token);
 	}
 
 	@Override
@@ -108,15 +111,17 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, Long> implement
 
 	@Transactional
     @Override
-	public void updatePassword(String password, UserEntity user) {
+	public void updatePassword(String password, TokenEntity token) {
 		
 		log.debug("Update password");
 		
-        UserEntity userRegistered = findById(user.getId());
+        UserEntity userRegistered = findById(token.getUser().getId());
         
         userRegistered.setPassword(passwordEncoder.encode(password));
         	
         userRepository.save(userRegistered);
+        
+        tokenRepository.delete(token);
 	}
 
 	@Override

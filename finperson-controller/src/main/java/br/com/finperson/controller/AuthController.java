@@ -137,10 +137,9 @@ public class AuthController extends BaseController{
 			}
 	    	
 	    	return messageError(request, new String[] {ConstantsMessages.NEW_TOKEN_TO_EXPIRED_TOKEN}, null);
-	    } 
-	     
-	    user.setEnabled(true); 
-	    userService.saveRegisteredUser(user); 
+	    }
+	     	    
+	    userService.registeredUserAndRemoveToken(verificationToken); 
 	    
         return ResponseEntity.ok(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_USER_CONFIRMED}, null));
 	}
@@ -186,7 +185,7 @@ public class AuthController extends BaseController{
 				return messageError(request, new String[] {ConstantsMessages.INVALID_TOKEN}, null);
 			}
 			
-			userService.updatePassword(updatePass.getPassword(), tokenUser.getUser());
+			userService.updatePassword(updatePass.getPassword(), tokenUser);
 			
 			return ResponseEntity.ok(messageSuccess(request, new String[] {ConstantsMessages.AUTHSIGUP_MESSAGE_PASSWORD_UPDATED}, null));
 			
