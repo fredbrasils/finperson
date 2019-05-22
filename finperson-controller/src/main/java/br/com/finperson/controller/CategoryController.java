@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.finperson.core.exception.EntityExistsException;
 import br.com.finperson.core.service.CategoryService;
-import br.com.finperson.core.service.UserService;
 import br.com.finperson.model.CategoryEntity;
 import br.com.finperson.model.UserEntity;
 import br.com.finperson.model.payload.GenericResponse;
@@ -30,8 +29,8 @@ public class CategoryController extends BaseController{
 
 	private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService, UserService userService) {
-    	super(userService);
+    public CategoryController(CategoryService categoryService) {
+    	super();
         this.categoryService = categoryService;
     }
     
@@ -44,7 +43,7 @@ public class CategoryController extends BaseController{
 	    	return messageError(request, new String[] {ConstantsMessages.INVALID_USER}, null);
 	    }
 	     
-	    List<CategoryEntity> list = categoryService.findAllByOrderByName();
+	    List<CategoryEntity> list = categoryService.findAllByUser(user).get();
 	    
         return ResponseEntity.ok(list);
     
@@ -60,7 +59,7 @@ public class CategoryController extends BaseController{
     		try {
     			categorySaved = categoryService.create(category);
 			} catch (EntityExistsException e) {
-				return messageError(request, new String[] {ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS}, null);
+				return messageError(request, new String[] {e.getMessage()}, null);
 			}
     	}else {
 			return messageError(request, validateErrors(result), null);
@@ -80,7 +79,7 @@ public class CategoryController extends BaseController{
     		try {
     			categorySaved = categoryService.update(category);
 			} catch (EntityExistsException e) {
-				return messageError(request, new String[] {ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS}, null);
+				return messageError(request, new String[] {e.getMessage()}, null);
 			}
     	}else {
 			return messageError(request, validateErrors(result), null);
