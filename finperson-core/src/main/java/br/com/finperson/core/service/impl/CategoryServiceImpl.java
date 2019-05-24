@@ -61,7 +61,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	
 	@Override
 	public Optional<List<CategoryEntity>> findAllByUser(UserEntity user) {
-		return categoryRepository.findByUserOrderByNameAsc(user);
+		return categoryRepository.findOptionalByUserOrderByNameAsc(user);
 	}
 
 	@Override
@@ -74,7 +74,28 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 
 	@Override
 	public Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user) {
-		return categoryRepository.findByIdAndUser(id,user);
+		return categoryRepository.findOptionalByIdAndUser(id,user);
+	}
+
+	@Override
+	public Optional<CategoryEntity> findByNameAndUser(String name, UserEntity user) {
+		return categoryRepository.findOptionalByNameAndUser(name,user);
 	}
 	
+	@Transactional
+    @Override
+	public CategoryEntity createSubCategory(CategoryEntity entity) throws EntityExistsException {
+		
+		log.debug("Create subcategory: ",entity.getName());
+		
+		Optional<CategoryEntity> categorySearched 
+			= categoryRepository.findOptionalByUserAndMainCategoryAndNameIgnoreCase(entity.getUser(), entity.getMainCategory(), entity.getName());
+		
+		if(categorySearched.isPresent()) {
+			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
+		}
+		
+		entity.setName(StringUtils.capitalize(entity.getName())); 
+		return categoryRepository.save(entity);
+	}
 }

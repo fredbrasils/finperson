@@ -30,6 +30,7 @@ public class ConstantsMessages {
 	public static final String USER_RESET_PASSWORD_MESSAGE = "user.resetpassword.message";
 	
 	public static final String CATEGORY_MESSAGE_ERROR_EXISTS = "category.message.error.exists";
+	public static final String SUBCATEGORY_MESSAGE_ERROR_WITHOUT_MAINCATEGORY = "subcategory.message.error.without.maincategory";
 	
 	public static final String SUCCESS = "operation.success";
 	

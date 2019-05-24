@@ -100,4 +100,29 @@ public class CategoryController extends BaseController{
 
     	return ResponseEntity.ok(messageSuccess(null, request, new String[] {ConstantsMessages.SUCCESS}, null));
     }
+    
+    /* SUBCATEGORY */
+    
+    @PostMapping("/subcategory/insert")
+    public ResponseEntity<GenericResponse> createSubCategory(@Valid @RequestBody CategoryEntity category, BindingResult result,
+			HttpServletRequest request, Errors errors) {
+    	CategoryEntity categorySaved = null;
+    	
+    	if (!result.hasErrors()) {
+    		
+    		if(category.getMainCategory() == null) {
+    			return messageError(request, new String[] {ConstantsMessages.SUBCATEGORY_MESSAGE_ERROR_WITHOUT_MAINCATEGORY}, null);
+    		}
+    	
+    		try {
+    			categorySaved = categoryService.createSubCategory(category);
+			} catch (EntityExistsException e) {
+				return messageError(request, new String[] {e.getMessage()}, null);
+			}
+    	}else {
+			return messageError(request, validateErrors(result), null);
+		} 
+
+    	return ResponseEntity.ok(messageSuccess(categorySaved, request, new String[] {ConstantsMessages.SUCCESS}, null));
+    }
 }

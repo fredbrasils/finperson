@@ -8,9 +8,16 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import br.com.finperson.model.CategoryEntity;
 import br.com.finperson.model.UserEntity;
 
-public interface CategoryRepository extends PagingAndSortingRepository<CategoryEntity, Long>{
+public interface CategoryRepository extends PagingAndSortingRepository<CategoryEntity, Long> {
 
 	Optional<CategoryEntity> findOptionalByUserAndNameIgnoreCase(UserEntity user, String name);
-	Optional<List<CategoryEntity>> findByUserOrderByNameAsc(UserEntity user);
-	Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user);
+
+	Optional<List<CategoryEntity>> findOptionalByUserOrderByNameAsc(UserEntity user);
+
+	Optional<CategoryEntity> findOptionalByIdAndUser(Long id, UserEntity user);
+
+	Optional<CategoryEntity> findOptionalByNameAndUser(String name, UserEntity user);
+
+	Optional<CategoryEntity> findOptionalByUserAndMainCategoryAndNameIgnoreCase(UserEntity user, CategoryEntity mainCategory,
+			String name);
 }
