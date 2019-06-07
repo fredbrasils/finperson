@@ -1,6 +1,6 @@
 package br.com.finperson.model;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,13 +8,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import br.com.finperson.model.jsonserializer.CategoryEntitySerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -29,14 +28,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "user_id"}))
+@Table(name = "category")
 public class CategoryEntity extends BaseEntity{
 
 	private static final long serialVersionUID = 1L;
 	
 	@Builder
 	public CategoryEntity(Long id, String name, String color, String icon, UserEntity user, 
-			CategoryEntity mainCategory, Set<CategoryEntity> subCategories, Boolean active) {
+			CategoryEntity mainCategory, List<CategoryEntity> subCategories, Boolean active) {
         super(id);     
         this.name = name;
         this.color = color;
@@ -47,14 +46,13 @@ public class CategoryEntity extends BaseEntity{
         this.active = active;
     }
 	
-	@JsonBackReference
+	@JsonSerialize(using = CategoryEntitySerializer.class)
 	@ManyToOne
 	@JoinColumn(name = "main_category_id")
-	CategoryEntity mainCategory;
-	
-	@JsonManagedReference
+	private CategoryEntity mainCategory;
+		
 	@OneToMany(mappedBy="mainCategory")
-	Set<CategoryEntity> subCategories;
+	private List<CategoryEntity> subCategories;
 	
 	@NotEmpty
 	@NotNull
@@ -77,5 +75,5 @@ public class CategoryEntity extends BaseEntity{
 	
 	@Builder.Default
 	@Column
-    private boolean active = true;
+    private Boolean active = true;
 }

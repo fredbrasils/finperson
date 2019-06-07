@@ -13,7 +13,11 @@ public interface CategoryService extends BaseService<CategoryEntity, Long>{
 	
 	CategoryEntity update(CategoryEntity entity) throws EntityExistsException;
 	
-	Optional<List<CategoryEntity>> findAllByUser(UserEntity user);
+	List<CategoryEntity> findAllByUser(UserEntity user);
 
 	Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user);
+	
+	Optional<CategoryEntity> findByNameAndUser(String name, UserEntity user);
+	
+	CategoryEntity createSubCategory(CategoryEntity entity) throws EntityExistsException;
 }

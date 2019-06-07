@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +40,7 @@ import br.com.finperson.core.service.CategoryService;
 import br.com.finperson.core.service.UserService;
 import br.com.finperson.model.CategoryEntity;
 import br.com.finperson.model.UserEntity;
+import br.com.finperson.util.ConstantsMessages;
 @ExtendWith(MockitoExtension.class)
 class CategoryControllerTest extends AbstractRestControllerTest{
 
@@ -81,9 +81,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	Optional<List<CategoryEntity>> categoryList = Optional.of(categories);
-    	
-    	when(categoryService.findAllByUser(ArgumentMatchers.any(UserEntity.class))).thenReturn(categoryList);
+    	when(categoryService.findAllByUser(ArgumentMatchers.any(UserEntity.class))).thenReturn(categories);
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -302,6 +300,104 @@ class CategoryControllerTest extends AbstractRestControllerTest{
                 .andExpect(status().isBadRequest());
 
         verify(categoryService, times(0)).delete(ArgumentMatchers.any());
+    }
+    
+    /* SUBCATEGORY */
+    
+    @DisplayName(value="Create a new subcategory")
+    @Test
+    void registerSubCategory() throws Exception {
+    	
+    	CategoryEntity cat = CategoryEntity.builder().build();
+    	cat.setId(1l);
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.name("work").icon("fas fa-plus").color("10-10-10-1")
+    			.mainCategory(cat)
+    			.build();
 
+    	when(categoryService.createSubCategory(ArgumentMatchers.any(CategoryEntity.class))).thenReturn(category);
+
+        mockMvc.perform(post("/api/category/subcategory/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.object.name", equalTo(category.getName())))
+                .andExpect(jsonPath("$.object.icon", equalTo(category.getIcon())))
+                .andExpect(jsonPath("$.object.color", equalTo(category.getColor())))
+           		.andExpect(jsonPath("$.object.mainCategory.id", equalTo(1)));        
+        
+        verify(categoryService).createSubCategory(ArgumentMatchers.any());
+    }
+    
+    @DisplayName(value="Dont create subcategory because miss field")
+    @Test
+    void dontCreateSubcategoryMissField() throws Exception {
+    	
+    	CategoryEntity cat = CategoryEntity.builder().build();
+    	cat.setId(1l);
+    	
+    	CategoryEntity category = CategoryEntity.builder()
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.mainCategory(cat)
+    			.build();
+
+    	mockMvc.perform(post("/api/category/subcategory/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                ;   
+              
+        verify(categoryService, times(0)).createSubCategory(ArgumentMatchers.any());
+        
+    }
+    
+    @DisplayName(value="Dont create subcategory because miss main category")
+    @Test
+    void dontCreateSubcategoryMissMainCategory() throws Exception {    	
+   	
+    	CategoryEntity category = CategoryEntity.builder().name("work")
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.build();
+
+    	when(messages.getMessage(anyString(),eq(null),ArgumentMatchers.any(Locale.class))).thenReturn(ConstantsMessages.SUBCATEGORY_MESSAGE_ERROR_WITHOUT_MAINCATEGORY);
+    	
+    	mockMvc.perform(post("/api/category/subcategory/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", org.hamcrest.Matchers.contains(ConstantsMessages.SUBCATEGORY_MESSAGE_ERROR_WITHOUT_MAINCATEGORY)))
+                ;   
+              
+        verify(categoryService, times(0)).createSubCategory(ArgumentMatchers.any());        
+    }
+    
+    @DisplayName(value="Dont create subcategory because subcategory already exists")
+    @Test
+    void dontCreateSubcategoryAlreadyExists() throws Exception {
+    	
+    	CategoryEntity cat = CategoryEntity.builder().build();
+    	cat.setId(1l);
+    	
+    	CategoryEntity category = CategoryEntity.builder().name("work")
+    			.icon("fas fa-plus").color("10-10-10-1")
+    			.mainCategory(cat)
+    			.build();
+
+    	when(categoryService.createSubCategory(ArgumentMatchers.any(CategoryEntity.class))).thenThrow(EntityExistsException.class);
+    	
+    	mockMvc.perform(post("/api/category/subcategory/insert")
+        		.accept(MediaType.APPLICATION_JSON)
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.content(asJsonString(category)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", equalTo(false)))
+                ;   
+              
+        verify(categoryService, times(1)).createSubCategory(ArgumentMatchers.any());
+        
     }
 }
