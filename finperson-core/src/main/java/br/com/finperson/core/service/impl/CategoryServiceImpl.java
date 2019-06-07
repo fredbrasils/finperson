@@ -60,8 +60,8 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	}
 	
 	@Override
-	public Optional<List<CategoryEntity>> findAllByUser(UserEntity user) {
-		return categoryRepository.findOptionalByUserOrderByNameAsc(user);
+	public List<CategoryEntity> findAllByUser(UserEntity user) {
+		return categoryRepository.findAllByUser(user);
 	}
 
 	@Override

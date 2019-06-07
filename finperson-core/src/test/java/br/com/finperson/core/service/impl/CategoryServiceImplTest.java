@@ -75,6 +75,10 @@ class CategoryServiceImplTest {
 				.build();
 		categoryService.save(medicationCategory);
 
+		CategoryEntity homeMedicationCategory = CategoryEntity.builder().name("Home Medication").color("10-10-10-1").icon("fas fa-plus")
+				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get())
+				.build();
+		categoryService.save(homeMedicationCategory);
 		
 		/* USER 2 */
 		user2 = UserEntity.builder().firstName("Paul").enabled(true).nonLocked(false)
@@ -105,15 +109,34 @@ class CategoryServiceImplTest {
 		categoryService.save(workCategory);
 	}
 	
-	@DisplayName("Find all category from user")
+	@DisplayName("Find all category from user without subcategories")
+	@Test
+	void findAllByUserWithoutSubcategories() {
+		
+		List<CategoryEntity> categories = categoryService.findAllByUser(user2);
+
+		assertNotNull(categories);
+		
+		categories.stream().forEach(cat -> 
+				assertTrue(cat.getSubCategories().isEmpty())				
+		);
+		
+	}
+	
+	@DisplayName("Find all category from user with subcategories")
 	@Test
 	void findAllByUser() {
 		
-		List<CategoryEntity> categories = categoryService.findAllByUser(user2).get();
+		List<CategoryEntity> categories = categoryService.findAllByUser(user1);
 
 		assertNotNull(categories);
-		assertEquals(3, categories.size());
-		assertEquals("Abc", categories.get(0).getName());
+		
+		categories.stream().forEach(cat -> {
+			if(cat.getName().equals("Health")) {
+				assertEquals(2, cat.getSubCategories().size());				
+			}
+		});
+		
 	}
 
 	@DisplayName("Find category from user")

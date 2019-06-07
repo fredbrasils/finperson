@@ -1,6 +1,6 @@
 package br.com.finperson.model;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,7 +35,7 @@ public class CategoryEntity extends BaseEntity{
 	
 	@Builder
 	public CategoryEntity(Long id, String name, String color, String icon, UserEntity user, 
-			CategoryEntity mainCategory, Set<CategoryEntity> subCategories, Boolean active) {
+			CategoryEntity mainCategory, List<CategoryEntity> subCategories, Boolean active) {
         super(id);     
         this.name = name;
         this.color = color;
@@ -49,10 +49,10 @@ public class CategoryEntity extends BaseEntity{
 	@JsonSerialize(using = CategoryEntitySerializer.class)
 	@ManyToOne
 	@JoinColumn(name = "main_category_id")
-	CategoryEntity mainCategory;
+	private CategoryEntity mainCategory;
 		
 	@OneToMany(mappedBy="mainCategory")
-	Set<CategoryEntity> subCategories;
+	private List<CategoryEntity> subCategories;
 	
 	@NotEmpty
 	@NotNull

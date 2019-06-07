@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,9 +81,7 @@ class CategoryControllerTest extends AbstractRestControllerTest{
     			.email("fredbrasils@hotmail.com")
     			.build();
 
-    	Optional<List<CategoryEntity>> categoryList = Optional.of(categories);
-    	
-    	when(categoryService.findAllByUser(ArgumentMatchers.any(UserEntity.class))).thenReturn(categoryList);
+    	when(categoryService.findAllByUser(ArgumentMatchers.any(UserEntity.class))).thenReturn(categories);
     	
     	Authentication authentication = Mockito.mock(Authentication.class);
     	SecurityContext securityContext = Mockito.mock(SecurityContext.class);
