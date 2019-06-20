@@ -12,15 +12,14 @@ import br.com.finperson.model.UserEntity;
 
 public interface CategoryRepository extends PagingAndSortingRepository<CategoryEntity, Long> {
 
-	Optional<CategoryEntity> findOptionalByUserAndNameIgnoreCase(UserEntity user, String name);
+	Optional<List<CategoryEntity>> findOptionalByUserAndNameIgnoreCase(UserEntity user, String name);
 
 	@Query("select distinct c from CategoryEntity c inner join fetch c.user u left join fetch c.subCategories sub where u = :user and c.mainCategory is null order by c.name, sub.name")
 	List<CategoryEntity> findAllByUser(@Param("user") UserEntity user);
 	
-	
-	Optional<CategoryEntity> findOptionalByIdAndUser(Long id, UserEntity user);
+	Optional<List<CategoryEntity>> findOptionalByIdAndUser(Long id, UserEntity user);
 
-	Optional<CategoryEntity> findOptionalByNameAndUser(String name, UserEntity user);
+	Optional<List<CategoryEntity>> findOptionalByNameAndUser(String name, UserEntity user);
 
 	Optional<CategoryEntity> findOptionalByUserAndMainCategoryAndNameIgnoreCase(UserEntity user, CategoryEntity mainCategory,
 			String name);

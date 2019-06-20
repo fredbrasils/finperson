@@ -71,12 +71,12 @@ class CategoryServiceImplTest {
 		categoryService.save(healthCategory);
 
 		CategoryEntity medicationCategory = CategoryEntity.builder().name("Medication").color("10-10-10-1").icon("fas fa-plus")
-				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get())
+				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get().get(0))
 				.build();
 		categoryService.save(medicationCategory);
 
 		CategoryEntity homeMedicationCategory = CategoryEntity.builder().name("Home Medication").color("10-10-10-1").icon("fas fa-plus")
-				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get())
+				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get().get(0))
 				.build();
 		categoryService.save(homeMedicationCategory);
 		
@@ -143,8 +143,8 @@ class CategoryServiceImplTest {
 	@Test
 	void findById() {
 		
-		Long id = categoryService.findByNameAndUser("Sport",user2).get().getId();
-		CategoryEntity category = categoryService.findByIdAndUser(id,user2).get();
+		Long id = categoryService.findByNameAndUser("Sport",user2).get().get(0).getId();
+		CategoryEntity category = categoryService.findByIdAndUser(id,user2).get().get(0);
 		assertNotNull(category);		
 	}		
 	
@@ -152,7 +152,7 @@ class CategoryServiceImplTest {
 	@Test
 	void delete() {
 		
-		CategoryEntity category = categoryService.findByNameAndUser("Home",user3).get();
+		CategoryEntity category = categoryService.findByNameAndUser("Home",user3).get().get(0);
 
 		categoryService.delete(category);
 		
@@ -163,7 +163,7 @@ class CategoryServiceImplTest {
 	@Test
 	void deleteById() {
 	
-		Long id = categoryService.findByNameAndUser("Work",user3).get().getId();		
+		Long id = categoryService.findByNameAndUser("Work",user3).get().get(0).getId();		
 		categoryService.deleteById(id);		
 		assertTrue(categoryService.findByIdAndUser(id,user3).isEmpty());
 	}
@@ -203,7 +203,7 @@ class CategoryServiceImplTest {
 	@Test
 	void update() {		
 				
-		CategoryEntity category = categoryService.findByNameAndUser("Food", user2).get();
+		CategoryEntity category = categoryService.findByNameAndUser("Food", user2).get().get(0);
 		category.setName("Food home");
 		
 		try {
@@ -212,7 +212,7 @@ class CategoryServiceImplTest {
 			fail();
 		}
 
-		category = categoryService.findByNameAndUser("Food home", user2).get();
+		category = categoryService.findByNameAndUser("Food home", user2).get().get(0);
 		assertEquals("Food home", category.getName());
 	}
 	
@@ -220,7 +220,7 @@ class CategoryServiceImplTest {
 	@Test
 	void dontUpdate() {		
 				
-		CategoryEntity category = categoryService.findByNameAndUser("Abc", user2).get();
+		CategoryEntity category = categoryService.findByNameAndUser("Abc", user2).get().get(0);
 		category.setName("Sport");
 		
 		try {
@@ -230,7 +230,7 @@ class CategoryServiceImplTest {
 			assertEquals(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS, e.getMessage());
 		}
 
-		category = categoryService.findByNameAndUser("Abc", user2).get();
+		category = categoryService.findByNameAndUser("Abc", user2).get().get(0);
 		assertEquals("Abc", category.getName());
 	}
 	
@@ -238,7 +238,7 @@ class CategoryServiceImplTest {
 	@Test
 	void updateTheSameCategory() {		
 				
-		CategoryEntity category = categoryService.findByNameAndUser("Transport", user1).get();
+		CategoryEntity category = categoryService.findByNameAndUser("Transport", user1).get().get(0);
 		category.setName("Transport");
 		
 		try {
@@ -247,7 +247,7 @@ class CategoryServiceImplTest {
 			fail();
 		}
 
-		category = categoryService.findByNameAndUser("Transport", user1).get();
+		category = categoryService.findByNameAndUser("Transport", user1).get().get(0);
 		assertEquals("Transport", category.getName());
 	}
 	
@@ -255,9 +255,9 @@ class CategoryServiceImplTest {
 	@Test
 	void findByNameAndUser() {
 		
-		Optional<CategoryEntity> category = categoryService.findByNameAndUser("Sport",user2);		
-		assertNotNull(category.get());		
-		assertEquals("Sport", category.get().getName());
+		Optional<List<CategoryEntity>> category = categoryService.findByNameAndUser("Sport",user2);		
+		assertNotNull(category.get().get(0));		
+		assertEquals("Sport", category.get().get(0).getName());
 	}
 	
 	/* SUBCATEGORY */
@@ -268,7 +268,7 @@ class CategoryServiceImplTest {
 		
 		CategoryEntity category = CategoryEntity.builder().name("Uber").color("10-10-10-1")
 				.icon("fas fa-plus").user(user1)
-				.mainCategory(categoryService.findByNameAndUser("Transport", user1).get())
+				.mainCategory(categoryService.findByNameAndUser("Transport", user1).get().get(0))
 				.build();
 
 		try {
@@ -285,8 +285,8 @@ class CategoryServiceImplTest {
 	@Test
 	void dontCreateSubCategory() {
 		
-		CategoryEntity category = CategoryEntity.builder().name("Medication").color("10-10-10-1").icon("fas fa-plus")
-				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get())
+		CategoryEntity category = CategoryEntity.builder().name("Home Medication").color("10-10-10-1").icon("fas fa-plus")
+				.user(user1).mainCategory(categoryService.findByNameAndUser("Health", user1).get().get(0))
 				.build();				
 		
 		try {
@@ -297,5 +297,66 @@ class CategoryServiceImplTest {
 		}
 
 		assertNull(category.getId());
+	}
+	
+	@DisplayName("Dont create a subcategory equal main category's name")
+	@Test
+	void dontCreateSubCategoryWithSameMaincategoryName() {
+		
+		CategoryEntity category = CategoryEntity.builder().name("Transport").color("10-10-10-1").icon("fas fa-plus")
+				.user(user1).mainCategory(categoryService.findByNameAndUser("Transport", user1).get().get(0))
+				.build();				
+		
+		try {
+			category = categoryService.createSubCategory(category);
+			fail();
+		} catch (EntityExistsException e) {
+			assertEquals(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS, e.getMessage());
+		}
+
+		assertNull(category.getId());
+	}
+	
+	@DisplayName("Dont update subcategory with same maincategory's name")
+	@Test
+	void dontUpdateSubcategoryWithSameMainCategoryName() {		
+			
+		CategoryEntity category = categoryService.findByNameAndUser("Home Medication", user1).get().get(0);
+		category.setName("Health");
+		
+		try {
+			category = categoryService.update(category);
+			fail();
+		} catch (EntityExistsException e) {
+			assertEquals(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS, e.getMessage());
+		}
+	}
+	
+	@DisplayName("Update subcategory")
+	@Test
+	void updateSubcategory() {		
+			
+		CategoryEntity category = categoryService.findByNameAndUser("Medication", user1).get().get(0);
+		category.setName("Transport");
+		
+		try {
+			category = categoryService.update(category);
+		} catch (EntityExistsException e) {
+			fail();
+		}
+		
+		List<CategoryEntity> cats = categoryService.findByNameAndUser("Transport", user1).get();
+		
+		boolean exist = false;
+		
+		for(CategoryEntity c : cats) {
+			if(c.getMainCategory() != null) {
+				exist = true;
+				assertEquals("Transport", c.getName());
+				assertEquals("Health", c.getMainCategory().getName());
+			}
+		}
+		
+		assertTrue(exist);
 	}
 }

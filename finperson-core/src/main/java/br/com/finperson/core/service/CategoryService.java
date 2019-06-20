@@ -15,9 +15,9 @@ public interface CategoryService extends BaseService<CategoryEntity, Long>{
 	
 	List<CategoryEntity> findAllByUser(UserEntity user);
 
-	Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user);
+	Optional<List<CategoryEntity>> findByIdAndUser(Long id, UserEntity user);
 	
-	Optional<CategoryEntity> findByNameAndUser(String name, UserEntity user);
+	Optional<List<CategoryEntity>> findByNameAndUser(String name, UserEntity user);
 	
 	CategoryEntity createSubCategory(CategoryEntity entity) throws EntityExistsException;
 }

@@ -2,6 +2,7 @@ package br.com.finperson.core.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.transaction.Transactional;
 
@@ -33,9 +34,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		
 		log.debug("Create category: ",entity.getName());
 		
-		Optional<CategoryEntity> categorySearched = categoryRepository.findOptionalByUserAndNameIgnoreCase(entity.getUser(),entity.getName());
-		
-		if(categorySearched.isPresent()) {
+		if(existCategory(entity)) {
 			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
 		}
 		
@@ -49,9 +48,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		
 		log.debug("Update category");
 		
-		Optional<CategoryEntity> categorySearched = categoryRepository.findOptionalByUserAndNameIgnoreCase(entity.getUser(),entity.getName());
-		
-		if(categorySearched.isPresent() && !categorySearched.get().getId().equals(entity.getId())) {
+		if(existCategory(entity)) {
 			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
 		}
 		
@@ -73,12 +70,12 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 	}
 
 	@Override
-	public Optional<CategoryEntity> findByIdAndUser(Long id, UserEntity user) {
+	public Optional<List<CategoryEntity>> findByIdAndUser(Long id, UserEntity user) {
 		return categoryRepository.findOptionalByIdAndUser(id,user);
 	}
 
 	@Override
-	public Optional<CategoryEntity> findByNameAndUser(String name, UserEntity user) {
+	public Optional<List<CategoryEntity>> findByNameAndUser(String name, UserEntity user) {
 		return categoryRepository.findOptionalByNameAndUser(name,user);
 	}
 	
@@ -91,11 +88,56 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity,Long> im
 		Optional<CategoryEntity> categorySearched 
 			= categoryRepository.findOptionalByUserAndMainCategoryAndNameIgnoreCase(entity.getUser(), entity.getMainCategory(), entity.getName());
 		
-		if(categorySearched.isPresent()) {
+		if(categorySearched.isPresent() || entity.getName().equals(entity.getMainCategory().getName()) ) {
 			throw new EntityExistsException(ConstantsMessages.CATEGORY_MESSAGE_ERROR_EXISTS);
 		}
 		
 		entity.setName(StringUtils.capitalize(entity.getName())); 
 		return categoryRepository.save(entity);
+	}
+	
+	private boolean existCategory(CategoryEntity entity) {
+		
+		boolean valid = false;
+		Optional<List<CategoryEntity>> categorySearched = categoryRepository.findOptionalByUserAndNameIgnoreCase(entity.getUser(),entity.getName());
+		
+		if(categorySearched.isPresent()) {
+			
+			Predicate<CategoryEntity> predicate = e -> 
+							(!e.getId().equals(entity.getId()) && equals(e.getMainCategory(), entity.getMainCategory()))
+							|| (e.getId().equals(entity.getId()) && !equals(e.getMainCategory(), entity.getMainCategory()))
+							|| (!e.getId().equals(entity.getId()) && equalsMainCategoryName(e,entity)  )
+							;
+			
+			valid = categorySearched.get().stream().anyMatch(predicate);
+		}
+		
+		return valid;
+	}
+	
+	private boolean equals(CategoryEntity cat1, CategoryEntity cat2) {
+		
+		if(cat1 == null &&  cat2 == null) {
+			return true;
+		}
+		
+		if( (cat1 == null &&  cat2 != null) || (cat1 != null &&  cat2 == null)) {
+			return false;
+		}
+		
+		return cat1.getId().equals(cat2.getId());
+	}
+	
+	private boolean equalsMainCategoryName(CategoryEntity cat1, CategoryEntity cat2) {
+		
+		if(cat1.getMainCategory() == null &&  cat2.getMainCategory() != null
+				&& cat1.getName().equals(cat2.getMainCategory().getName())) {
+			return true;
+		}else if(cat2.getMainCategory() == null &&  cat1.getMainCategory() != null
+				&& cat2.getName().equals(cat1.getMainCategory().getName())) {
+			return true;
+		}
+				
+		return false;
 	}
 }
